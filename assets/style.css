@@ -1,0 +1,60 @@
+.big_container
+{
+    display: flex;
+}
+.words
+{
+    height: 480px;
+    width: 20%;
+    border-bottom: thin lightgrey solid;
+    text-align: right;
+}
+.middle_field
+{
+    width: 60%;
+    height: 480px;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+.bookmark_history
+{
+    width: 20%;
+    height: 480px;
+}
+.documents
+{
+    width: 97%;
+    height: 46%;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.results
+{
+    width: 97%;
+    height: 46%;
+    margin: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.bookmark
+{
+    width: 90%;
+    height: 46%;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.history
+{
+    width: 90%;
+    height: 46%;
+    margin: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}

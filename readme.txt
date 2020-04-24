@@ -1,6 +1,3 @@
-# urank
-Requirement: Download anaconda 
-
 1. conda create --file env.txt -n urank
 2. activate urank
 3. pip install -r requirements.txt
