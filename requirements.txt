@@ -2,3 +2,6 @@ matplotlib
 numpy
 dash
 PyPDF2
+tika
+p2
+pdfplumber
