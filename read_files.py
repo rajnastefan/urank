@@ -4,39 +4,36 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import pdfplumber
+from search import UserInput
 
 app = dash.Dash()
 app.title = "uRank"
-CURRENT_LIMIT_OF_PAGES = 50
-STARTING_PAGE = 21
 
-input_dir = os.path.join(os.getcwd(), "pdfs-master")
 pdf_dict = {}
+test = UserInput()
 
 
-def extract_and_print_text(pdf):
-    counter = STARTING_PAGE
-    while counter < CURRENT_LIMIT_OF_PAGES:
-        page = pdf.pages[counter]
-        text = page.extract_text()
-        words_from_text = text.split()
-        # print(words_from_text)
-        counter = counter + 1
-    return words_from_text
+def select_topics(topic):
+    test.select_topic(topic)
+    print('mala kurcina', test.pdf_dict)
 
 
-for file in os.listdir(input_dir):
-    if file[-4:] == ".pdf":
-        try:
-            path_to_file = os.path.join(input_dir, file)
-            print(path_to_file)
-            pdf = pdfplumber.open(path_to_file)
-            list_of_words = extract_and_print_text(pdf)
-            pdf_dict.update({file: list_of_words})
-        except:
-            print("[ERROR] loading " + file)
+def add_new_keyword(keyword):
+    test.fill_term_list(keyword)
+    search_based_on_keyword()
+
+def search_based_on_keyword():
+    print("usla sam ?")
+    for keyword in test.list_of_terms:
+        print("usla sam 2?")
+        for x, y in test.pdf_dict.items():
+            print("usla sam 3?")
+            if keyword in y:
+                print('Ime fajla ->', x)
+
 
 for x, y in pdf_dict.items():
+    #    test.fill_term_list(y)
     print(x, y)
 
 #######################
@@ -68,5 +65,13 @@ app.layout = \
         ], style={"border": "1px solid black"})
     ])
 #######################
+
+def main():
+    print("pozvo prva")
+    print("pozvo select topics")
+
 if __name__ == '__main__':
+    select_topics("topics")
+    add_new_keyword("edition")
     app.run_server(debug=False, port=8090)
+
