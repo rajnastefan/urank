@@ -10,23 +10,25 @@ app = dash.Dash()
 app.title = "uRank"
 
 pdf_dict = {}
-test = UserInput()
+indexer_and_searcher = UserInput()
 
 
 def select_topics(topic):
-    test.select_topic(topic)
-    print('mala kurcina', test.pdf_dict)
+    #test.select_topic(topic)
+    #print('mala kurcina', test.pdf_dict)
+
+    indexer_and_searcher.index_files(topic)
 
 
 def add_new_keyword(keyword):
-    test.fill_term_list(keyword)
-    search_based_on_keyword()
+    indexer_and_searcher.fill_term_list(keyword)
+    indexer_and_searcher.search_files(keyword)
 
 def search_based_on_keyword():
     print("usla sam ?")
-    for keyword in test.list_of_terms:
+    for keyword in indexer_and_searcher.list_of_terms:
         print("usla sam 2?")
-        for x, y in test.pdf_dict.items():
+        for x, y in indexer_and_searcher.pdf_dict.items():
             print("usla sam 3?")
             if keyword in y:
                 print('Ime fajla ->', x)
@@ -71,7 +73,7 @@ def main():
     print("pozvo select topics")
 
 if __name__ == '__main__':
-    select_topics("topics")
+    select_topics("tema1")
     add_new_keyword("edition")
     app.run_server(debug=False, port=8090)
 

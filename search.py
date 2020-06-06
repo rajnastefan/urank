@@ -1,5 +1,10 @@
 import os
 import pdfplumber
+import base64
+import subprocess
+import os
+from elasticsearch import Elasticsearch
+
 
 CURRENT_LIMIT_OF_PAGES = 50
 STARTING_PAGE = 21
@@ -9,11 +14,60 @@ class UserInput:
   list_of_terms = []
   pdf_dict = {}
 
+  pdf_indexes = {}
+  es = Elasticsearch()
+  print(es.cat.health())
+
+  body = {
+    "description": "Extract attachment information",
+    "processors": [
+      {
+        "attachment": {
+          "field": "data"
+        }
+      }
+    ]
+  }
+  es.index(index='_ingest', doc_type='pipeline', id='attachment', body=body)
+
 
   def __init__(self):
     self.list_of_terms = []
     #self.pdf_dict = []
 
+  #----------------new implementation------------------------------------------------#
+
+  def parse_pdf(self, filename):
+    try:
+      content = subprocess.check_output(["pdftotext", '-enc', 'UTF-8', filename, "-"])
+    except subprocess.CalledProcessError as e:
+      print('Skipping {} (pdftotext returned status {})'.format(filename, e.returncode))
+      return None
+    return base64.b64encode(content).decode('ascii')
+
+  def index_files(self, topic):
+    directory = "topics/" + topic
+    input_dir = os.path.join(os.getcwd(), directory)
+
+    index_value = 0
+
+    for file in os.listdir(input_dir):
+      content = self.parse_pdf(directory + "/" + file)
+      index_value = index_value + 1
+      new_index = 'my_index_' + str(index_value)
+      current_index = self.es.index(index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={'data': content})
+      self.pdf_indexes.update({file: current_index})
+
+  def search_files(self, keyword):
+    for file_name, content in self.pdf_indexes.items():
+      search = self.es.search(index=content['_index'], doc_type='my_type', q=keyword)
+      print(file_name)
+      print(search['hits']['max_score'])
+
+  #################################################################################
+
+
+  #---------------old implementation------------------------------#
   def select_topic(self, topics):
     self.topics = topics
     self.list_of_terms = []
@@ -46,3 +100,4 @@ class UserInput:
           self.pdf_dict.update({file: list_of_words})
         except:
           print("[ERROR] loading " + file)
+  #################################################################################
