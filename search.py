@@ -14,8 +14,9 @@ class UserInput:
   list_of_terms = []
   pdf_dict = {}
 
+  found_pdfs = {}
   pdf_indexes = {}
-  es = Elasticsearch()
+  es = Elasticsearch([{'host':'localhost','port':9200}])
   print(es.cat.health())
 
   body = {
@@ -33,7 +34,8 @@ class UserInput:
 
   def __init__(self):
     self.list_of_terms = []
-    #self.pdf_dict = []
+    self.pdf_indexes = {}
+    self.found_pdfs = {}
 
   #----------------new implementation------------------------------------------------#
 
@@ -58,11 +60,15 @@ class UserInput:
       current_index = self.es.index(index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={'data': content})
       self.pdf_indexes.update({file: current_index})
 
-  def search_files(self, keyword):
-    for file_name, content in self.pdf_indexes.items():
-      search = self.es.search(index=content['_index'], doc_type='my_type', q=keyword)
-      print(file_name)
-      print(search['hits']['max_score'])
+  def search_files(self):
+    for keyword in self.list_of_terms:
+      for file_name, content in self.pdf_indexes.items():
+        self.es.indices.refresh(index=content['_index'])
+        search = self.es.search(index=content['_index'], doc_type='my_type', q=keyword)
+        if(search['hits']['max_score'] != None):
+          self.found_pdfs.update({file_name: search['hits']['max_score']})
+        #print(file_name)
+        #print(search['hits']['max_score'])
 
   #################################################################################
 

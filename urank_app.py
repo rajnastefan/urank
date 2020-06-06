@@ -22,7 +22,9 @@ def select_topics(topic):
 
 def add_new_keyword(keyword):
     indexer_and_searcher.fill_term_list(keyword)
-    indexer_and_searcher.search_files(keyword)
+    indexer_and_searcher.search_files()
+    print("found results: ")
+    print(indexer_and_searcher.found_pdfs)
 
 def search_based_on_keyword():
     print("usla sam ?")
@@ -74,6 +76,6 @@ def main():
 
 if __name__ == '__main__':
     select_topics("tema1")
-    add_new_keyword("edition")
+    add_new_keyword("Nvidia")
     app.run_server(debug=False, port=8090)
 
