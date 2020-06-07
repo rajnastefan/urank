@@ -24,6 +24,7 @@ def select_topics(topic):
 
 def add_new_keyword(keyword):
     indexer_and_searcher.fill_term_list(keyword)
+
     search_based_on_keyword()
 
     # indexer_and_searcher.search_files()
@@ -134,5 +135,10 @@ if __name__ == '__main__':
 
     select_topics("topics/tema1")
     add_new_keyword("algorithms")
+
+
+    #--------for es-------------#
+    #select_topics("tema1")
+    #add_new_keyword("algorithms")
 
 

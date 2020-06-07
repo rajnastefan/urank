@@ -66,7 +66,9 @@ class UserInput:
         self.es.indices.refresh(index=content['_index'])
         search = self.es.search(index=content['_index'], doc_type='my_type', q=keyword)
         if(search['hits']['max_score'] != None):
-          self.found_pdfs.update({file_name: search['hits']['max_score']})
+          self.found_pdfs.update({file_name: self.extract_words(file_name)})
+
+
         #print(file_name)
         #print(search['hits']['max_score'])
 
@@ -106,4 +108,9 @@ class UserInput:
           self.pdf_dict.update({file: list_of_words})
         except:
           print("[ERROR] loading " + file)
+
+  def extract_words(self, path_to_file):
+    pdf = pdfplumber.open("topics/tema1/" + path_to_file)
+    list_of_words = self.extract_and_print_text(pdf)
+    return list_of_words
   #################################################################################
