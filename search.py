@@ -87,11 +87,13 @@ class UserInput:
 
   def extract_and_print_text(self, pdf):
     counter = STARTING_PAGE
+    all_words = []
     while counter < CURRENT_LIMIT_OF_PAGES:
       page = pdf.pages[counter]
       text = page.extract_text()
       words_from_text = text.split()
       # print(words_from_text)
+      all_words.append(words_from_text)
       counter = counter + 1
     return words_from_text
 
