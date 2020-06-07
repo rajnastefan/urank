@@ -1,3 +1,4 @@
-FROM elasticsearch:5
+FROM elasticsearch:6.8.1
 
-RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-attachment
+
+RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch ingest-attachment
