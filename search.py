@@ -11,25 +11,25 @@ STARTING_PAGE = 21
 
 
 class UserInput:
-  # list_of_terms = []
-  # pdf_dict = {}
-  #
-  # found_pdfs = {}
-  # pdf_indexes = {}
-  # es = Elasticsearch([{'host':'localhost','port':9200}])
-  # print(es.cat.health())
-  #
-  # body = {
-  #   "description": "Extract attachment information",
-  #   "processors": [
-  #     {
-  #       "attachment": {
-  #         "field": "data"
-  #       }
-  #     }
-  #   ]
-  # }
-  # es.index(index='_ingest', doc_type='pipeline', id='attachment', body=body)
+  list_of_terms = []
+  pdf_dict = {}
+
+  found_pdfs = {}
+  pdf_indexes = {}
+  es = Elasticsearch([{'host':'localhost','port':9200}])
+  print(es.cat.health())
+
+  body = {
+    "description": "Extract attachment information",
+    "processors": [
+      {
+        "attachment": {
+          "field": "data"
+        }
+      }
+    ]
+  }
+  es.index(index='_ingest', doc_type='pipeline', id='attachment', body=body)
 
 
   def __init__(self):

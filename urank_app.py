@@ -16,17 +16,19 @@ indexer_and_searcher = UserInput()
 
 
 def select_topics(topic):
-    #test.select_topic(topic)
-    #print('mala kurcina', test.pdf_dict)
+    indexer_and_searcher.select_topic(topic)
+    print('test: ', indexer_and_searcher.pdf_dict)
 
-    indexer_and_searcher.index_files(topic)
+    #indexer_and_searcher.index_files(topic)
 
 
 def add_new_keyword(keyword):
     indexer_and_searcher.fill_term_list(keyword)
-    indexer_and_searcher.search_files()
-    print("found results: ")
-    print(indexer_and_searcher.found_pdfs)
+    search_based_on_keyword()
+
+    # indexer_and_searcher.search_files()
+    # print("found results: ")
+    # print(indexer_and_searcher.found_pdfs)
 
 def search_based_on_keyword():
     print("usla sam ?")
@@ -34,6 +36,9 @@ def search_based_on_keyword():
         print("usla sam 2?")
         for x, y in indexer_and_searcher.pdf_dict.items():
             print("usla sam 3?")
+
+            print("keyword: " + keyword)
+            print("y: " + str(y))
             if keyword in y:
                 print('Ime fajla ->', x)
 
@@ -125,7 +130,9 @@ def main():
     print("pozvo select topics")
 
 if __name__ == '__main__':
-    # select_topics("tema1")
-    # add_new_keyword("Nvidia")
-    app.run_server(debug=False, port=8090)
+    #app.run_server(debug=False, port=8090)
+
+    select_topics("topics/tema1")
+    add_new_keyword("algorithms")
+
 
