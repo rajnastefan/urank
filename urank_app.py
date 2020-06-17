@@ -37,10 +37,6 @@ lista = {
   }
 }
 
-for x, y in lista.items():
-  print(x)
-  print(y)
-
 
 def select_topics(topic):
   # indexer_and_searcher.select_topic(topic)
@@ -85,26 +81,6 @@ def choose_words(value):
   else:
     return []
 
-
-def update_plot(topic):
-  return {
-    'data': [
-      dict(
-        x=[1, 2, 3],
-        y=[4, 1, 2],
-        type='bar',
-        text=y.get("keyword"),
-        name=topic
-      ) for i, y in lista.items()
-      # {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'SF'},
-      # {'x': [1, 2, 3], 'y': [2, 4, 5], 'type': 'bar', 'name': u'Montréal'},
-    ],
-    'layout': {
-      'title': 'Dash Data Visualization'
-    }
-  }
-
-
 topics = ['Doc 1', 'Doc 2']
 
 #######################
@@ -143,16 +119,68 @@ app.layout = \
       ], style={"border": "1px solid black"}),
       html.Div(className="results", children=[
         html.P("Histogram C"),
-        html.Button(topics[0], id='submit', value='Doc1', n_clicks=0),
-        html.Button('Doc 2', id='submit2', value='Doc2', n_clicks=0),
-        html.Button('Doc 3', id='submit3', value='Doc3', n_clicks=0),
-        html.Button('Doc 4', id='submit4', value='Doc4', n_clicks=0),
-        html.Button('Doc 5', id='submit5', value='Doc5', n_clicks=0),
-        dcc.Graph(id='graph'),
-        html.Div(id='graph2'),
-        html.Div(id='graph3'),
-        html.Div(id='graph4'),
-        html.Div(id='graph5'),
+        dcc.Tabs([
+          dcc.Tab(label='Tab one', children=[
+            dcc.Graph(
+              figure={
+                'data': [
+                  {'x': [1, 2, 3], 'y': [4, 1, 2],
+                   'type': 'bar', 'name': 'SF'},
+                  {'x': [1, 2, 3], 'y': [2, 4, 5],
+                   'type': 'bar', 'name': u'Montréal'},
+                ]
+              }
+            )
+          ]),
+          dcc.Tab(label='Tab two', children=[
+            dcc.Graph(
+              figure={
+                'data': [
+                  {'x': [1, 2, 3], 'y': [1, 4, 1],
+                   'type': 'bar', 'name': 'SF'},
+                  {'x': [1, 2, 3], 'y': [1, 2, 3],
+                   'type': 'bar', 'name': u'Montréal'},
+                ]
+              }
+            )
+          ]),
+          dcc.Tab(label='Tab three', children=[
+            dcc.Graph(
+              figure={
+                'data': [
+                  {'x': [1, 2, 3], 'y': [2, 4, 3],
+                   'type': 'bar', 'name': 'SF'},
+                  {'x': [1, 2, 3], 'y': [5, 4, 3],
+                   'type': 'bar', 'name': u'Montréal'},
+                ]
+              }
+            )
+          ]),
+          dcc.Tab(label='Tab four', children=[
+            dcc.Graph(
+              figure={
+                'data': [
+                  {'x': [1, 2, 3], 'y': [2, 4, 3],
+                   'type': 'bar', 'name': 'SF'},
+                  {'x': [1, 2, 3], 'y': [5, 4, 3],
+                   'type': 'bar', 'name': u'Montréal'},
+                ]
+              }
+            )
+          ]),
+          dcc.Tab(label='Tab five', children=[
+            dcc.Graph(
+              figure={
+                'data': [
+                  {'x': [1, 2, 3], 'y': [2, 4, 3],
+                   'type': 'bar', 'name': 'SF'},
+                  {'x': [1, 2, 3], 'y': [5, 4, 3],
+                   'type': 'bar', 'name': u'Montréal'},
+                ]
+              }
+            )
+          ]),
+        ])
       ], style={"border": "1px solid black"})
     ], style={"border": "1px solid black"}),
 
@@ -183,79 +211,6 @@ def update_df(value):
 def update_df(value):
   return [html.P(value), html.P(value), html.P(value), html.P(value), html.P(value), html.P(value)]
 
-
-#############
-# PLOT START #
-#############
-@app.callback(
-  Output(component_id='graph', component_property='figure'),
-  [Input(component_id='submit5', component_property='value'),
-   Input(component_id='submit5', component_property='n_clicks'),
-   Input(component_id='submit4', component_property='value'),
-   Input(component_id='submit4', component_property='n_clicks'),
-   ])
-def update_df(value, n_clicks):
-  print("kurac")
-  return update_plot(value)
-  # if value == 'Doc4':
-  #   print("Dobar")
-  #   print("Got ->", n_clicks)
-  #   return update_plot(value)
-
-
-# @app.callback(
-#   Output(component_id='example-graph', component_property='figure'),
-#   [Input(component_id='submit4', component_property='value'),
-#    Input(component_id='submit4', component_property='n_clicks'),
-#    ])
-# def update_df(value, n_clicks):
-#   print("Callback for Doc4 ", value)
-#   if n_clicks > 1:
-#     print("Got ->", value)
-#     return update_plot(value)
-
-
-#############
-# PLOT END #
-#############
-#
-# @app.callback(
-#   Output(component_id='graph', component_property='children'),
-#   [Input(component_id='submit3', component_property='value'),
-#    Input(component_id='submit3', component_property='n_clicks'),
-#    ])
-# def update_df(value, n_clicks):
-#   if n_clicks > 1:
-#     print("Veci sam sa -> ", value)
-#     print("Got ->", value)
-#     return update_plot(value)
-#
-#
-# @app.callback(
-#   Output(component_id='graph', component_property='children'),
-#   [Input(component_id='submit2', component_property='value'),
-#    Input(component_id='submit2', component_property='n_clicks'),
-#    ])
-# def update_df(value, n_clicks):
-#   if n_clicks > 1:
-#     print("Veci sam sa -> ", value)
-#     print("Got ->", value)
-#     return update_plot(value)
-#
-#
-# @app.callback(
-#   Output(component_id='graph', component_property='children'),
-#   [Input(component_id='submit', component_property='value'),
-#    Input(component_id='submit', component_property='n_clicks'),
-#    ])
-# def update_df(value, n_clicks):
-#   if n_clicks > 0:
-#     print("Veci sam sa -> ", value)
-#     print("Got ->", value)
-#     return update_plot(value)
-#############
-# PLOT END #
-#############
 
 def main():
   print("pozvo prva")
