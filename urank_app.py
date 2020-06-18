@@ -43,6 +43,8 @@ lista = {
 
 only_keywords = []
 frequency_of_keywords = []
+topics = ['Doc 1', 'Doc 2', 'Doc 3', 'Doc 4', 'Doc 5']
+
 for x, y in lista.items():
   only_keywords = y.get('keywords')
 
@@ -97,7 +99,6 @@ def choose_words(value):
     return []
 
 
-topics = ['Doc 1', 'Doc 2', 'Doc 3', 'Doc 4', 'Doc 5']
 
 #######################
 # FRONTEND
