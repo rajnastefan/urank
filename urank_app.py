@@ -15,27 +15,42 @@ indexer_and_searcher = UserInput()
 
 lista = {
   "c++ guide": {
+    # "pdfs"
     "keywords": {
       "C++": 300,
       "sql": 0,
-      "nvidia": 50
+      "nvidia": 50,
+      "testna rijec": 290
     }
   },
   "sql guide": {
     "keywords": {
       "C++": 300,
-      "sql": 0,
-      "nvidia": 50
+      "sql": 1,
+      "nvidia": 50,
+      "testna rijec": 290
     }
   },
   "nvidia gpu": {
     "keywords": {
       "C++": 300,
-      "sql": 0,
-      "nvidia": 50
+      "sql": 5,
+      "nvidia": 50,
+      "testna rijec": 290
     }
   }
 }
+
+only_keywords = []
+frequency_of_keywords = []
+for x, y in lista.items():
+  only_keywords = y.get('keywords')
+
+for x, y in only_keywords.items():
+  frequency_of_keywords.append(y)
+
+print("Frequency", frequency_of_keywords)
+print("Keywords", only_keywords)
 
 
 def select_topics(topic):
@@ -118,76 +133,8 @@ app.layout = \
         html.P("Documents B"),
         html.Div(id="test")
       ], style={"border": "1px solid black"}),
-      html.Div(className="results", children=[
+      html.Div(id="histogram", className="results", children=[
         html.P("Histogram C"),
-        dcc.Tabs([
-          dcc.Tab(label=topics[0], children=[
-            dcc.Graph(
-              figure={
-                'data': [
-                  {'x': [1, 2, 3], 'y': [4, 1, 2],
-                   'type': 'bar', 'name': 'SF'},
-                  {'x': [1, 2, 3], 'y': [2, 4, 5],
-                   'type': 'bar', 'name': u'Montréal'},
-                ]
-              }
-            )
-          ]),
-          dcc.Tab(label=topics[1], children=[
-            dcc.Graph(
-              figure={
-                'data': [
-                  {'x': [1, 2, 3], 'y': [1, 4, 1],
-                   'type': 'bar', 'name': 'SF'},
-                  {'x': [1, 2, 3], 'y': [1, 2, 3],
-                   'type': 'bar', 'name': u'Montréal'},
-                ]
-              }
-            )
-          ]),
-          dcc.Tab(label=topics[2], children=[
-            dcc.Graph(
-              figure={
-                'data': [
-                  {'x': [1, 2, 3], 'y': [2, 4, 3],
-                   'type': 'bar', 'name': 'SF'},
-                  {'x': [1, 2, 3], 'y': [5, 4, 3],
-                   'type': 'bar', 'name': u'Montréal'},
-                ]
-              }
-            )
-          ]),
-          dcc.Tab(label=topics[3], children=[
-            dcc.Graph(
-              figure={
-                'data': [
-                  {'x': [1, 2, 3], 'y': [2, 4, 3],
-                   'type': 'bar', 'name': 'SF'},
-                  {'x': [1, 2, 3], 'y': [5, 4, 3],
-                   'type': 'bar', 'name': u'Montréal'},
-                ]
-              }
-            )
-          ]),
-          dcc.Tab(label=topics[4], children=[
-            dcc.Graph(
-              figure={
-                'data': [
-                  dict(
-                    x=[1, 2, 3],
-                    y=[4, 1, 2],
-                    type='bar',
-                    text=y.get("keyword"),
-                    name=x
-                  ) for x, y in lista.items()
-                ],
-                'layout': {
-                  'title': 'Dash Data Visualization'
-                }
-              }
-            )
-          ]),
-        ])
       ], style={"border": "1px solid black"})
     ], style={"border": "1px solid black"}),
 
@@ -201,7 +148,17 @@ app.layout = \
     ], style={"border": "1px solid black"})
   ])
 
+for y, name in zip(frequency_of_keywords, only_keywords.keys()):
+  print("y ->", y)
+  print("name ->", name)
 
+
+# for i,j in y.items():
+# for k,l in j.items():
+# print(j.keys())
+# break
+# print(k)
+# print(l)
 #######################
 
 
@@ -217,6 +174,108 @@ def update_df(value):
   [Input(component_id='words-dropdown', component_property='value')])
 def update_df(value):
   return [html.P(value), html.P(value), html.P(value), html.P(value), html.P(value), html.P(value)]
+
+
+@app.callback(
+  Output(component_id='histogram', component_property='children'),
+  [Input(component_id='words-dropdown', component_property='value')])
+def make_plot(value):
+  print("Dropdown", value)
+  if value != None:
+    return dcc.Tabs([
+      dcc.Tab(label=topics[0], children=[
+        dcc.Graph(
+          figure={
+            'data': [
+              dict(
+                x=4,
+                y=[y],
+                type='bar',
+                text=name,
+                name=name
+              ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
+            ],
+            'layout': {
+              'title': 'C++'
+            }
+          }
+        )
+      ]),
+      dcc.Tab(label=topics[1], children=[
+        dcc.Graph(
+          figure={
+            'data': [
+              dict(
+                x=4,
+                y=[y],
+                type='bar',
+                text=name,
+                name=name
+              ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
+            ],
+            'layout': {
+              'title': 'C++'
+            }
+          }
+        )
+      ]),
+      dcc.Tab(label=topics[2], children=[
+        dcc.Graph(
+          figure={
+            'data': [
+              dict(
+                x=4,
+                y=[y],
+                type='bar',
+                text=name,
+                name=name
+              ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
+            ],
+            'layout': {
+              'title': 'C++'
+            }
+          }
+        )
+      ]),
+      dcc.Tab(label=topics[3], children=[
+        dcc.Graph(
+          figure={
+            'data': [
+              dict(
+                x=4,
+                y=[y],
+                type='bar',
+                text=name,
+                name=name
+              ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
+            ],
+            'layout': {
+              'title': 'C++'
+            }
+          }
+        )
+      ]),
+      dcc.Tab(label=topics[4], children=[
+        dcc.Graph(
+          figure={
+            'data': [
+              dict(
+                x=4,
+                y=[y],
+                type='bar',
+                text=name,
+                name=name
+              ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
+            ],
+            'layout': {
+              'title': 'C++'
+            }
+          }
+        )
+      ]),
+    ])
+  else:
+    return None
 
 
 def main():
