@@ -81,7 +81,8 @@ def choose_words(value):
   else:
     return []
 
-topics = ['Doc 1', 'Doc 2']
+
+topics = ['Doc 1', 'Doc 2', 'Doc 3', 'Doc 4', 'Doc 5']
 
 #######################
 # FRONTEND
@@ -120,7 +121,7 @@ app.layout = \
       html.Div(className="results", children=[
         html.P("Histogram C"),
         dcc.Tabs([
-          dcc.Tab(label='Tab one', children=[
+          dcc.Tab(label=topics[0], children=[
             dcc.Graph(
               figure={
                 'data': [
@@ -132,7 +133,7 @@ app.layout = \
               }
             )
           ]),
-          dcc.Tab(label='Tab two', children=[
+          dcc.Tab(label=topics[1], children=[
             dcc.Graph(
               figure={
                 'data': [
@@ -144,7 +145,7 @@ app.layout = \
               }
             )
           ]),
-          dcc.Tab(label='Tab three', children=[
+          dcc.Tab(label=topics[2], children=[
             dcc.Graph(
               figure={
                 'data': [
@@ -156,7 +157,7 @@ app.layout = \
               }
             )
           ]),
-          dcc.Tab(label='Tab four', children=[
+          dcc.Tab(label=topics[3], children=[
             dcc.Graph(
               figure={
                 'data': [
@@ -168,15 +169,21 @@ app.layout = \
               }
             )
           ]),
-          dcc.Tab(label='Tab five', children=[
+          dcc.Tab(label=topics[4], children=[
             dcc.Graph(
               figure={
                 'data': [
-                  {'x': [1, 2, 3], 'y': [2, 4, 3],
-                   'type': 'bar', 'name': 'SF'},
-                  {'x': [1, 2, 3], 'y': [5, 4, 3],
-                   'type': 'bar', 'name': u'Montréal'},
-                ]
+                  dict(
+                    x=[1, 2, 3],
+                    y=[4, 1, 2],
+                    type='bar',
+                    text=y.get("keyword"),
+                    name=x
+                  ) for x, y in lista.items()
+                ],
+                'layout': {
+                  'title': 'Dash Data Visualization'
+                }
               }
             )
           ]),
