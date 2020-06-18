@@ -47,30 +47,44 @@ class UserInput:
       return None
     return base64.b64encode(content).decode('ascii')
 
-  def index_files(self, topic):
+  def index_files(self):
+    themes = subfolders = [ f.path for f in os.scandir("topics") if f.is_dir() ]
+
+    for theme in themes:
+      input_dir = os.path.join(os.getcwd(), theme)
+      index_value = 0
+
+      for file in os.listdir(input_dir):
+        content = self.parse_pdf(theme + "/" + file)
+        index_value = index_value + 0
+        new_index = theme.split("/")[1] + '_index_' + str(index_value)
+        self.es.index(index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={'data': content})
+
+  def prepare_indexes_for_searching(self, topic):
     directory = "topics/" + topic
     input_dir = os.path.join(os.getcwd(), directory)
 
-    index_value = 0
-
+    index_number = 0
     for file in os.listdir(input_dir):
-      content = self.parse_pdf(directory + "/" + file)
-      index_value = index_value + 1
-      new_index = 'my_index_' + str(index_value)
-      current_index = self.es.index(index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={'data': content})
-      self.pdf_indexes.update({file: current_index})
+      index_number = index_number + 1
+      index = topic + "_index_" + str(index_number)
+      self.pdf_indexes.update({file: index})
+
+  def search(self, keyword):
+    self.es.indices.refresh(index="my_index_2")
+    search = self.es.search(index="my_index_2", doc_type='my_type', q=keyword)
+    if (search['hits']['max_score'] != None):
+      print("naso sam ga")
 
   def search_files(self):
     for keyword in self.list_of_terms:
-      for file_name, content in self.pdf_indexes.items():
-        self.es.indices.refresh(index=content['_index'])
-        search = self.es.search(index=content['_index'], doc_type='my_type', q=keyword)
+      for file_name, current_index in self.pdf_indexes.items():
+        self.es.indices.refresh(index=current_index)
+        search = self.es.search(index=current_index, doc_type='my_type', q=keyword)
         if(search['hits']['max_score'] != None):
+          print(self.es.count(index=current_index, doc_type='my_type', q="Nvdia"))
+
           self.found_pdfs.update({file_name: self.extract_words(file_name)})
-
-
-        #print(file_name)
-        #print(search['hits']['max_score'])
 
   #################################################################################
 
@@ -95,7 +109,7 @@ class UserInput:
       # print(words_from_text)
       all_words.append(words_from_text)
       counter = counter + 1
-    return words_from_text
+    return all_words
 
   def open_file(self, topic_directory):
     # topic_directory = "topics\\" + topic_directory
@@ -112,7 +126,7 @@ class UserInput:
           print("[ERROR] loading " + file)
 
   def extract_words(self, path_to_file):
-    pdf = pdfplumber.open("topics/tema1/" + path_to_file)
+    pdf = pdfplumber.open("topics/thema1/" + path_to_file)
     list_of_words = self.extract_and_print_text(pdf)
     return list_of_words
   #################################################################################

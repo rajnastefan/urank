@@ -45,15 +45,14 @@ for x, y in lista.items():
 def select_topics(topic):
   # indexer_and_searcher.select_topic(topic)
   # print('test: ', indexer_and_searcher.pdf_dict)
-
-  indexer_and_searcher.index_files(topic)
+  indexer_and_searcher.prepare_indexes_for_searching(topic)
 
 
 def add_new_keyword(keyword):
   indexer_and_searcher.fill_term_list(keyword)
   indexer_and_searcher.search_files()
   print("found results: ")
-  print(indexer_and_searcher.found_pdfs)
+  #print(indexer_and_searcher.found_pdfs)
 
 
 def search_based_on_keyword():
@@ -255,6 +254,12 @@ def main():
 
 
 if __name__ == '__main__':
-  ## select_topics("tema1")
-  # add_new_keyword("Nvidia")
-  app.run_server(debug=False, port=8090)
+  #index all files --> call this only when you start your container
+  #indexer_and_searcher.index_files()
+
+  #user select some topic
+  select_topics("thema1")
+  add_new_keyword("Nvidia")
+
+
+  #app.run_server(debug=False, port=8090)
