@@ -3,6 +3,7 @@ import pdfplumber
 import base64
 import subprocess
 import os
+import re
 from elasticsearch import Elasticsearch
 
 
@@ -13,7 +14,7 @@ STARTING_PAGE = 21
 class UserInput:
   list_of_terms = []
   pdf_dict = {}
-
+  topic = None
   found_pdfs = {}
   pdf_indexes = {}
   es = Elasticsearch([{'host':'localhost','port':9200}])
@@ -36,6 +37,7 @@ class UserInput:
     self.list_of_terms = []
     self.pdf_indexes = {}
     self.found_pdfs = {}
+    self.topic = None
 
   #----------------new implementation------------------------------------------------#
 
@@ -56,11 +58,12 @@ class UserInput:
 
       for file in os.listdir(input_dir):
         content = self.parse_pdf(theme + "/" + file)
-        index_value = index_value + 0
-        new_index = theme.split("/")[1] + '_index_' + str(index_value)
+        index_value = index_value + 1
+        new_index = theme.split("\\")[1] + '_index_' + str(index_value)
         self.es.index(index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={'data': content})
 
   def prepare_indexes_for_searching(self, topic):
+    self.topic = topic
     directory = "topics/" + topic
     input_dir = os.path.join(os.getcwd(), directory)
 
@@ -70,11 +73,6 @@ class UserInput:
       index = topic + "_index_" + str(index_number)
       self.pdf_indexes.update({file: index})
 
-  def search(self, keyword):
-    self.es.indices.refresh(index="my_index_2")
-    search = self.es.search(index="my_index_2", doc_type='my_type', q=keyword)
-    if (search['hits']['max_score'] != None):
-      print("naso sam ga")
 
   def search_files(self):
     for keyword in self.list_of_terms:
@@ -82,9 +80,18 @@ class UserInput:
         self.es.indices.refresh(index=current_index)
         search = self.es.search(index=current_index, doc_type='my_type', q=keyword)
         if(search['hits']['max_score'] != None):
-          print(self.es.count(index=current_index, doc_type='my_type', q="Nvdia"))
-
+          content = self.parse_pdf("topics/" + self.topic + "/" + file_name)
+          print(content)
+          temp_index = self.es.index(index="temp_index", doc_type='my_type', pipeline='attachment', refresh=True, body={'data': content})
+          doc = self.es.get(index='temp_index', doc_type='my_type', id=temp_index['_id'])
+          count = sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(keyword), doc['_source']['attachment']['content'], re.IGNORECASE))
+          print("occurence " + str(count))
           self.found_pdfs.update({file_name: self.extract_words(file_name)})
+
+
+  def set_output(self):
+    return 0
+
 
   #################################################################################
 
