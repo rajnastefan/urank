@@ -81,18 +81,30 @@ class UserInput:
         search = self.es.search(index=current_index, doc_type='my_type', q=keyword)
         if(search['hits']['max_score'] != None):
           content = self.parse_pdf("topics/" + self.topic + "/" + file_name)
-          print(content)
           temp_index = self.es.index(index="temp_index", doc_type='my_type', pipeline='attachment', refresh=True, body={'data': content})
           doc = self.es.get(index='temp_index', doc_type='my_type', id=temp_index['_id'])
-          count = sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(keyword), doc['_source']['attachment']['content'], re.IGNORECASE))
-          print("occurence " + str(count))
-          self.found_pdfs.update({file_name: self.extract_words(file_name)})
+          word_count = sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(keyword), doc['_source']['attachment']['content'], re.IGNORECASE))
+          if(word_count != 0):
+            self.set_output(word_count, file_name, keyword)
+          #self.found_pdfs.update({file_name: self.extract_words(file_name)})
 
 
-  def set_output(self):
-    return 0
-
-
+  def set_output(self, word_count, file_name, keyword):
+    exists = False
+    if(len(self.found_pdfs) == 0):
+        temp_dict = {file_name: {'keywords': {}}}
+        temp_dict[file_name]['keywords'] = {keyword: word_count}
+        self.found_pdfs.update(temp_dict)
+    else:
+        for file, value in self.found_pdfs.items():
+            if(file == file_name):
+                self.found_pdfs[file_name]['keywords'][keyword] = word_count
+            else:
+                exists = True
+        if(exists):
+            temp_dict = {file_name: {'keywords': {}}}
+            temp_dict[file_name]['keywords'] = {keyword: word_count}
+            self.found_pdfs.update(temp_dict)
   #################################################################################
 
 

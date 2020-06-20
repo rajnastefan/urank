@@ -13,6 +13,9 @@ app.title = "uRank"
 pdf_dict = {}
 indexer_and_searcher = UserInput()
 
+{'NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf': {'keywords': {'Deep Learning': 29}}}
+
+
 lista = {
   "c++ guide": {
     "keywords": {
@@ -37,10 +40,16 @@ lista = {
   }
 }
 
-for x, y in lista.items():
-  print(x)
-  print(y)
 
+# for x, y in lista1.items():
+#
+#   print("thema " + x)
+#   for it, it1 in y.items():
+#     for jt, j2 in it1.items():
+#       print("word " + jt)
+#       print("occurence " + str(j2))
+#
+#
 
 def select_topics(topic):
   # indexer_and_searcher.select_topic(topic)
@@ -52,7 +61,7 @@ def add_new_keyword(keyword):
   indexer_and_searcher.fill_term_list(keyword)
   indexer_and_searcher.search_files()
   print("found results: ")
-  #print(indexer_and_searcher.found_pdfs)
+  print(indexer_and_searcher.found_pdfs)
 
 
 def search_based_on_keyword():
@@ -259,7 +268,7 @@ if __name__ == '__main__':
 
   #user select some topic
   select_topics("thema1")
+  add_new_keyword("Deep Learning")
   add_new_keyword("Nvidia")
-
-
+  add_new_keyword("Oracle")
   #app.run_server(debug=False, port=8090)
