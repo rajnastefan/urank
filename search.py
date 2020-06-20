@@ -1,11 +1,8 @@
-import os
 import pdfplumber
-import base64
 import subprocess
 import os
 import re
 import PyPDF2
-from fpdf import FPDF
 import base64
 import json
 from elasticsearch import Elasticsearch
@@ -61,7 +58,6 @@ class UserInput:
 
       # Use 'iteritems()` instead of 'items()' for Python 2
       for meta, value in pdf_meta.items():
-          print(meta, value)
           all_pages["meta"][meta] = value
 
       # iterate the page numbers
@@ -104,8 +100,7 @@ class UserInput:
         content = self.pdf_operations(os.path.join(theme, file))
         index_value = index_value + 1
         new_index = theme.split("\\")[1] + '_index_' + str(index_value)
-        print("indexed")
-        self.es.index(id = index_value, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={"data": content})
+        self.es.index(id = new_index, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={"data": content})
 
   def prepare_indexes_for_searching(self, topic):
     self.topic = topic
@@ -125,13 +120,10 @@ class UserInput:
         self.es.indices.refresh(index=current_index)
         search = self.es.search(index=current_index, doc_type='my_type', q=keyword)
         if(search['hits']['max_score'] != None):
-          content = self.parse_pdf("topics/" + self.topic + "/" + file_name)
-          temp_index = self.es.index(index="temp_index", doc_type='my_type', pipeline='attachment', refresh=True, body={'data': content})
-          doc = self.es.get(index='temp_index', doc_type='my_type', id=temp_index['_id'])
+          doc = self.es.get(index=current_index, doc_type='my_type', id=current_index)
           word_count = sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(keyword), doc['_source']['attachment']['content'], re.IGNORECASE))
           if(word_count != 0):
             self.set_output(word_count, file_name, keyword)
-          #self.found_pdfs.update({file_name: self.extract_words(file_name)})
 
 
   def set_output(self, word_count, file_name, keyword):

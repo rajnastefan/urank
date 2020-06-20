@@ -261,7 +261,7 @@ def main():
 
 if __name__ == '__main__':
   #index all files --> call this only when you start your container
-  indexer_and_searcher.index_files()
+  #indexer_and_searcher.index_files()
 
   #user select some topic
   select_topics("thema1")
