@@ -4,14 +4,15 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import pdfplumber
-from search import UserInput
+# from search import UserInput
 from dash.dependencies import Input, Output
+
 
 app = dash.Dash()
 app.title = "uRank"
 
 pdf_dict = {}
-indexer_and_searcher = UserInput()
+# indexer_and_searcher = UserInput()
 
 lista = {
   "c++ guide": {
@@ -119,7 +120,7 @@ print("")
 app.layout = \
   html.Div(className="big_container", children=[
     html.Title("uRank"),
-    html.Div(className="topic", children=[
+    html.Div(className="words", children=[
       html.P('Choose a topic'),
       # html.Br(),
       # html.Br(),
@@ -130,16 +131,18 @@ app.layout = \
           {'label': 'SQL Books', 'value': 'SQL Books'},
           {'label': 'nVidia GPU', 'value': 'nVidia GPU'}
         ],
+        style=dict(
+                    horizontalAlign="left",
+                    verticalAlign="middle"
+                )
       ),
-    ], style={"border": "1px solid black"}),
-    html.Div(className="words", children=[
       html.P('Choose a words'),
       dcc.Dropdown(
         id='words-dropdown',
         # funkcija koja ce sadrzati rijeci
         multi=True
       ),
-    ], style={"border": "1px solid black"}),
+    ]),
 
     html.Div(className="middle_field", children=[
       html.Div(className="documents", children=[
@@ -168,7 +171,7 @@ app.layout = \
       html.Div(className="history", children=[
         html.P("History E")
       ], style={"border": "1px solid black"})
-    ], style={"border": "1px solid black"})
+    ])
   ])
 
 

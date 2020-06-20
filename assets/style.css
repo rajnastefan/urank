@@ -4,10 +4,10 @@
 }
 .words
 {
-    height: 480px;
+    height: 100vh;
     width: 20%;
     border-bottom: thin lightgrey solid;
-    text-align: right;
+    background-color: #DAF0EB;
 }
 .middle_field
 {
@@ -18,8 +18,9 @@
 }
 .bookmark_history
 {
+    background-color: #DAF0EB;
+    height: 100vh;
     width: 20%;
-    height: 480px;
 }
 .documents
 {
