@@ -6,6 +6,12 @@ import dash_html_components as html
 import pdfplumber
 # from search import UserInput
 from dash.dependencies import Input, Output
+import base64
+import fitz
+import io
+
+from pdf2image import convert_from_path, convert_from_bytes
+
 
 
 app = dash.Dash()
@@ -52,8 +58,17 @@ for x, y in lista.items():
 for x, y in only_keywords.items():
   frequency_of_keywords.append(y)
 
-print("Frequency", frequency_of_keywords)
-print("Keywords", only_keywords)
+
+def highlight_text_in_pdf(filename, words):
+  doc = fitz.open(filename)
+  for page in doc:
+    for word in words:
+      text_instance = page.searchFor(word)
+      if (text_instance):
+        for inst in text_instance:
+          highlight = page.addHighlightAnnot(inst)
+
+  doc.save(os.path.join(filename.split("/")[0], filename.split("/")[1], "output_" + filename.split("/")[2]), garbage=4, deflate=True, clean=True)
 
 
 def select_topics(topic):
@@ -128,18 +143,76 @@ app.layout = \
       dcc.Input(
         id="input_search",
         type="search",
+        value="nvidia",
         placeholder="input word",
-      )
+      ),
+      html.Button('Submit', id='submit-val', n_clicks=0),
     ]),
 
     html.Div(className="middle_field", children=[
-      html.Div(className="documents", children=[
-        html.P("Documents B"),
-        html.Div(id="test")
-      ], style={"border": "1px solid black"}),
+      html.Div(id="test1"),
       html.Div(id="histogram", className="results", children=[
-        html.P("Histogram C"),
-      ], style={"border": "1px solid black"})
+        dcc.Tabs([
+              dcc.Tab(label=topics[0], children=[
+                dcc.Graph(
+                  figure={
+                    'data': [
+                      dict(
+                        x=4,
+                        y=[y],
+                        type='bar',
+                        text=name,
+                        name=name
+                      ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
+                    ],
+                    'layout': {
+                      'title': 'C++'
+                    }
+                  }
+                ),
+                html.Button('View', id='view_' + topics[0], n_clicks=0),
+              ]),
+          dcc.Tab(label=topics[1], children=[
+            dcc.Graph(
+              figure={
+                'data': [
+                  dict(
+                    x=4,
+                    y=[y],
+                    type='bar',
+                    text=name,
+                    name=name
+                  ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
+                ],
+                'layout': {
+                  'title': 'C++'
+                }
+              }
+            ),
+            html.Button('View', id='view_' + topics[1], n_clicks=0),
+          ]),
+          dcc.Tab(label=topics[2], children=[
+            dcc.Graph(
+              figure={
+                'data': [
+                  dict(
+                    x=4,
+                    y=[y],
+                    type='bar',
+                    text=name,
+                    name=name
+                  ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
+                ],
+                'layout': {
+                  'title': 'C++'
+                }
+              }
+            ),
+            html.Button('View', id='view_' + topics[2], n_clicks=0),
+          ])
+          ])
+
+      ])
     ]),
 
     html.Div(className="bookmark_history", children=[
@@ -152,140 +225,26 @@ app.layout = \
     ])
   ])
 
-for y, name in zip(frequency_of_keywords, only_keywords.keys()):
-  print("y ->", y)
-  print("name ->", name)
-
-
-# for i,j in y.items():
-# for k,l in j.items():
-# print(j.keys())
-# break
-# print(k)
-# print(l)
-#######################
-
-
-# @app.callback(
-#   Output(component_id='words-dropdown', component_property='options'),
-#   [Input(component_id='topic-dropdown', component_property='value')])
-# def update_df(value):
-#   return choose_words(value)
+@app.callback(
+  Output(component_id='test1', component_property='children'),
+  [Input(component_id='input_search', component_property='value'),
+   Input(component_id='view_' + topics[0], component_property='n_clicks')])
+def open_pdf(value, n_clicks):
+  if(n_clicks > 0):
+    highlight_text_in_pdf("topics/tema1/NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf", [value])
+    os.startfile(r"C:\Users\rajna\Documents\urank\topics\tema1\output_NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf")
+    n_clicks = 0
 
 #
-@app.callback(
-  Output(component_id='test', component_property='children'),
-  [Input(component_id='input_search', component_property='value')])
-def update_df(value):
-  return [html.P(value), html.P(value), html.P(value), html.P(value), html.P(value), html.P(value)]
-
-
-@app.callback(
-  Output(component_id='histogram', component_property='children'),
-  [Input(component_id='words-dropdown', component_property='value')])
-def make_plot(value):
-  print("Dropdown", value)
-  if value != None:
-    return dcc.Tabs([
-      dcc.Tab(label=topics[0], children=[
-        dcc.Graph(
-          figure={
-            'data': [
-              dict(
-                x=4,
-                y=[y],
-                type='bar',
-                text=name,
-                name=name
-              ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
-            ],
-            'layout': {
-              'title': 'C++'
-            }
-          }
-        )
-      ]),
-      dcc.Tab(label=topics[1], children=[
-        dcc.Graph(
-          figure={
-            'data': [
-              dict(
-                x=4,
-                y=[y],
-                type='bar',
-                text=name,
-                name=name
-              ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
-            ],
-            'layout': {
-              'title': 'C++'
-            }
-          }
-        )
-      ]),
-      dcc.Tab(label=topics[2], children=[
-        dcc.Graph(
-          figure={
-            'data': [
-              dict(
-                x=4,
-                y=[y],
-                type='bar',
-                text=name,
-                name=name
-              ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
-            ],
-            'layout': {
-              'title': 'C++'
-            }
-          }
-        )
-      ]),
-      dcc.Tab(label=topics[3], children=[
-        dcc.Graph(
-          figure={
-            'data': [
-              dict(
-                x=4,
-                y=[y],
-                type='bar',
-                text=name,
-                name=name
-              ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
-            ],
-            'layout': {
-              'title': 'C++'
-            }
-          }
-        )
-      ]),
-      dcc.Tab(label=topics[4], children=[
-        dcc.Graph(
-          figure={
-            'data': [
-              dict(
-                x=4,
-                y=[y],
-                type='bar',
-                text=name,
-                name=name
-              ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
-            ],
-            'layout': {
-              'title': 'C++'
-            }
-          }
-        )
-      ]),
-    ])
-  else:
-    return None
-
-
-def main():
-  print("pozvo prva")
-  print("pozvo select topics")
-
+# @app.callback(
+#   Output(component_id='histogram', component_property='children'),
+#   [Input(component_id='input_search', component_property='value')])
+# def make_plot(value):
+#   print("Dropdown", value)
+#   if value != None:
+#     return
+#   else:
+#     return None
 
 if __name__ == '__main__':
   ## select_topics("tema1")
