@@ -4,6 +4,10 @@ import base64
 import subprocess
 import os
 import re
+import PyPDF2
+from fpdf import FPDF
+import base64
+import json
 from elasticsearch import Elasticsearch
 
 
@@ -40,6 +44,46 @@ class UserInput:
     self.topic = None
 
   #----------------new implementation------------------------------------------------#
+  def pdf_operations(self, filename):
+      read_pdf = PyPDF2.PdfFileReader(filename, strict=False)
+
+      # get the read object's meta info
+      pdf_meta = read_pdf.getDocumentInfo()
+
+      # get the page numbers
+      num = read_pdf.getNumPages()
+
+      # create a dictionary object for page data
+      all_pages = {}
+
+      # put meta data into a dict key
+      all_pages["meta"] = {}
+
+      # Use 'iteritems()` instead of 'items()' for Python 2
+      for meta, value in pdf_meta.items():
+          print(meta, value)
+          all_pages["meta"][meta] = value
+
+      # iterate the page numbers
+      for page in range(num):
+          data = read_pdf.getPage(page)
+          # page_mode = read_pdf.getPageMode()
+
+          # extract the page's text
+          page_text = data.extractText()
+
+          # put the text data into the dict
+          all_pages[page] = page_text
+
+      # create a JSON string from the dictionary
+      json_data = json.dumps(all_pages)
+
+      # convert JSON string to bytes-like obj
+      bytes_string = bytes(json_data, 'utf-8')
+
+      # convert bytes to base64 encoded string
+      return base64.b64encode(bytes_string).decode('ascii')
+
 
   def parse_pdf(self, filename):
     try:
@@ -50,17 +94,18 @@ class UserInput:
     return base64.b64encode(content).decode('ascii')
 
   def index_files(self):
-    themes = subfolders = [ f.path for f in os.scandir("topics") if f.is_dir() ]
+    themes = [ f.path for f in os.scandir("topics") if f.is_dir() ]
 
     for theme in themes:
       input_dir = os.path.join(os.getcwd(), theme)
       index_value = 0
 
       for file in os.listdir(input_dir):
-        content = self.parse_pdf(theme + "/" + file)
+        content = self.pdf_operations(os.path.join(theme, file))
         index_value = index_value + 1
         new_index = theme.split("\\")[1] + '_index_' + str(index_value)
-        self.es.index(index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={'data': content})
+        print("indexed")
+        self.es.index(id = index_value, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={"data": content})
 
   def prepare_indexes_for_searching(self, topic):
     self.topic = topic

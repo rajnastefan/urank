@@ -13,9 +13,6 @@ app.title = "uRank"
 pdf_dict = {}
 indexer_and_searcher = UserInput()
 
-{'NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf': {'keywords': {'Deep Learning': 29}}}
-
-
 lista = {
   "c++ guide": {
     "keywords": {
@@ -264,7 +261,7 @@ def main():
 
 if __name__ == '__main__':
   #index all files --> call this only when you start your container
-  #indexer_and_searcher.index_files()
+  indexer_and_searcher.index_files()
 
   #user select some topic
   select_topics("thema1")
