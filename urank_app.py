@@ -137,11 +137,11 @@ app.layout = \
                 )
       ),
       html.P('Choose a words'),
-      dcc.Dropdown(
-        id='words-dropdown',
-        # funkcija koja ce sadrzati rijeci
-        multi=True
-      ),
+      dcc.Input(
+        id="input_search",
+        type="search",
+        placeholder="input word",
+      )
     ]),
 
     html.Div(className="middle_field", children=[
@@ -162,7 +162,7 @@ app.layout = \
         html.Div(id='graph4'),
         html.Div(id='graph5'),
       ], style={"border": "1px solid black"})
-    ], style={"border": "1px solid black"}),
+    ]),
 
     html.Div(className="bookmark_history", children=[
       html.Div(className="bookmark", children=[
@@ -178,16 +178,16 @@ app.layout = \
 #######################
 
 
-@app.callback(
-  Output(component_id='words-dropdown', component_property='options'),
-  [Input(component_id='topic-dropdown', component_property='value')])
-def update_df(value):
-  return choose_words(value)
+# @app.callback(
+#   Output(component_id='words-dropdown', component_property='options'),
+#   [Input(component_id='topic-dropdown', component_property='value')])
+# def update_df(value):
+#   return choose_words(value)
 
-
+#
 @app.callback(
   Output(component_id='test', component_property='children'),
-  [Input(component_id='words-dropdown', component_property='value')])
+  [Input(component_id='input_search', component_property='value')])
 def update_df(value):
   return [html.P(value), html.P(value), html.P(value), html.P(value), html.P(value), html.P(value)]
 
