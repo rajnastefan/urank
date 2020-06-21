@@ -43,7 +43,7 @@ def update_graphs():
   list_tabs = []
   for key in indexer_and_searcher.found_pdfs.keys():
     list_tabs.append(
-    dcc.Tab(label=key.split(" ")[0], children=[
+    dcc.Tab(label=key.split(".pd")[0], children=[
       dcc.Graph(
         figure={
           'data': [
@@ -56,14 +56,21 @@ def update_graphs():
             ) for name in indexer_and_searcher.found_pdfs[key]["keywords"]
           ],
           'layout': {
-            'title': key.split(" ")[0]
+            'title': key.split(".pd")[0]
           }
         }
       ),
-      html.Button('View', id='view_' + key.split(" ")[0], n_clicks=0),
+      html.Button('View', id='view_' + key.split(".pd")[0], n_clicks=0),
     ]))
   return list_tabs
 
+def select_themas():
+  return_list = []
+  for subdir, dirs, files in os.walk("topics"):
+    for dir in dirs:
+      return_list.append({'label': dir, 'value': dir})
+
+  return return_list
 
 #######################
 # FRONTEND
@@ -77,11 +84,7 @@ app.layout = \
       # html.Br(),
       dcc.Dropdown(
         id='topic-dropdown',
-        options=[
-          {'label': 'thema1', 'value': 'thema1'},
-          {'label': 'thema2', 'value': 'thema2'},
-          {'label': 'thema3', 'value': 'thema3'}
-        ],
+        options=select_themas(),
       ),
       html.P('Choose a words'),
       dcc.Input(
@@ -169,6 +172,6 @@ def open_pdf(n_clicks):
     os.startfile(r"C:\Users\rajna\Documents\urank\topics\thema1\output_NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf")
 
 if __name__ == '__main__':
-  #indexer_and_searcher.index_files()
+  # indexer_and_searcher.index_files()
   app.run_server(debug=False)
 
