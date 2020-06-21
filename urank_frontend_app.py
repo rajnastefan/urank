@@ -173,5 +173,7 @@ def open_pdf(n_clicks):
 
 if __name__ == '__main__':
   # indexer_and_searcher.index_files()
-  app.run_server(debug=False)
+  # app.run_server(debug=False)
+  print(indexer_and_searcher.get_all_bookmarks())
+  #indexer_and_searcher.index_bookmarks(["bookmark", "bookmark"])
 

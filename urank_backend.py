@@ -13,6 +13,7 @@ STARTING_PAGE = 21
 
 
 class UserInput:
+  bookmarkes = []
   list_of_terms = []
   pdf_dict = {}
   topic = None
@@ -35,12 +36,71 @@ class UserInput:
 
 
   def __init__(self):
+    self.bookmarkes = []
     self.list_of_terms = []
     self.pdf_indexes = {}
     self.found_pdfs = {}
     self.topic = None
 
   #----------------new implementation------------------------------------------------#
+  def get_all_bookmarks(self):
+    print("test")
+    bookmarks = []
+    if not(self.check_first_index()):
+      return []
+    else:
+      last = False
+      count = 1
+      while (not last):
+        print(count)
+        current_index = "bookmark_index_" + str(count)
+        if (self.es.indices.exists(index=current_index)):
+          doc = self.es.get(index=current_index, doc_type='my_type', id=current_index)
+          bookmarks.append(doc['_source']['attachment']['content'])
+          count = count + 1
+        else:
+          last = True
+
+    return bookmarks
+
+  def index_bookmarks(self, bookmarks):
+    if (self.check_first_index()):
+      index_value = self.get_last_index() + 1
+    else:
+      index_value = 0
+
+    for bookmark in bookmarks:
+      content = {"bookmark": bookmark}
+      json_data = json.dumps(content)
+      bytes_string = bytes(json_data, 'utf-8')
+      data = base64.b64encode(bytes_string).decode('ascii')
+
+
+      index_value = index_value + 1
+      new_index = 'bookmark_index_' + str(index_value)
+      print(bookmark)
+
+      self.es.index(id=new_index, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body = {'data': data})
+
+
+  def check_first_index(self):
+    if(self.es.indices.exists(index="bookmark_index_1")):
+      return True
+    else:
+      return False
+
+  def get_last_index(self):
+    last = False
+    count = 1
+    while (not last):
+      if (self.es.indices.exists(index="bookmark_index_" + str(count))):
+        last = True
+      else:
+        count = count + 1
+
+    return count
+
+
   def pdf_operations(self, filename):
       pdf_text = parser.from_file(filename)
 
