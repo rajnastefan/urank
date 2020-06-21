@@ -44,7 +44,7 @@ def update_graphs():
   list_tabs = []
   for key in indexer_and_searcher.found_pdfs.keys():
     list_tabs.append(
-      dcc.Tab(label=key.split(".pd")[0], id="current_tab", children=[
+      dcc.Tab(label=key.split(".pd")[0], id=key.split(".pd")[0], value=key.split(".pd")[0], children=[
         dcc.Graph(
           figure={
             'data': [
@@ -62,27 +62,41 @@ def update_graphs():
           }
         ),
         html.Button('View', id='view_' + key.split(".pd")[0], n_clicks=0),
-        # html.I(id='bookmark-doc', n_clicks=0, className='fi-star'),
+        html.I(id='bookmark_doc_' + key.split(".pd")[0], n_clicks=0, className='fi-star'),
 
       ]))
   return list_tabs
 
+def get_input_parameters():
+  list_of_something = []
+  for key in indexer_and_searcher.found_pdfs.keys():
+    list_of_something.append(Input(component_id='bookmark_doc_' + key.split(".pd")[0], component_property='n_clicks'))
+  list_of_something.append(Input(component_id='tabs', component_property='value'))
+  return list_of_something
+
 @app.callback(
-  Output(component_id='bookmark', component_property='children'),
-  [Input(component_id='bookmark_doc', component_property='n_clicks'),
-   Input(component_id='current_tab', component_property='label')]
+  Output(component_id='bookmark_list', component_property='children'),
+  get_input_parameters()
 )
-def bookmark(n_clicks, label):
-  print("tu sam", label)
-  if n_clicks > 0:
-    if label is not None:
-      if label not in Utils.bookmarked_documents:
-        Utils.bookmarked_documents.append(label)
-      return [html.P(word) for word in Utils.history_word]
-    elif label == "":
-      [html.P(doc) for doc in Utils.bookmarked_documents]
-  else:
-    [html.P(doc) for doc in Utils.bookmarked_documents]
+def bookmark(*args):
+  print("Spaj0o value", *args)
+  # print("n clicks", n_clicks)
+  # print("bookmark clicks", Utils.bookmark_click_count)
+  # if n_clicks > Utils.bookmark_click_count:
+  #   print("tu")
+  #   if value is not None:
+  #     print("tu dole")
+  #     if value not in Utils.bookmarked_documents:
+  #       Utils.bookmarked_documents.append(value)
+  #       print("lista", Utils.bookmarked_documents)
+  #     print("Bookmarked stuff", [html.P(doc) for doc in Utils.bookmarked_documents])
+  #     Utils.bookmark_click_count = n_clicks
+  #     return [html.P(doc) for doc in Utils.bookmarked_documents]
+  #   elif value == "":
+  #     print("prazan label")
+  #     [html.P(doc) for doc in Utils.bookmarked_documents]
+  # else:
+  #   [html.P(doc) for doc in Utils.bookmarked_documents]
 
 
 def select_themas():
@@ -115,7 +129,6 @@ app.layout = \
         placeholder="search",
       ),
       html.Button('Submit', id='submit_val', n_clicks=0),
-      html.I(id='bookmark_doc', n_clicks=0, className='fi-star')
     ]),
 
     html.Div(className="middle_field", children=[
@@ -132,7 +145,7 @@ app.layout = \
     html.Div(className="bookmark_history", children=[
       html.Div(className="bookmark", children=[
         html.P("Bookmark"),
-        html.Div(id="bookmark")
+        html.Div(id="bookmark_list")
       ]),
       html.Div(id="his", className="history", children=[html.P("History"),
                                                         html.Button('Clear history', id='clear_history',
