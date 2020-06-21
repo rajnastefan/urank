@@ -6,7 +6,7 @@ import PyPDF2
 import base64
 import json
 from elasticsearch import Elasticsearch
-
+from tika import parser
 
 CURRENT_LIMIT_OF_PAGES = 50
 STARTING_PAGE = 21
@@ -42,37 +42,11 @@ class UserInput:
 
   #----------------new implementation------------------------------------------------#
   def pdf_operations(self, filename):
-      read_pdf = PyPDF2.PdfFileReader(filename, strict=False)
-
-      # get the read object's meta info
-      pdf_meta = read_pdf.getDocumentInfo()
-
-      # get the page numbers
-      num = read_pdf.getNumPages()
-
-      # create a dictionary object for page data
-      all_pages = {}
-
-      # put meta data into a dict key
-      all_pages["meta"] = {}
-
-      # Use 'iteritems()` instead of 'items()' for Python 2
-      for meta, value in pdf_meta.items():
-          all_pages["meta"][meta] = value
-
-      # iterate the page numbers
-      for page in range(num):
-          data = read_pdf.getPage(page)
-          # page_mode = read_pdf.getPageMode()
-
-          # extract the page's text
-          page_text = data.extractText()
-
-          # put the text data into the dict
-          all_pages[page] = page_text
+      pdf_text = parser.from_file(filename)
 
       # create a JSON string from the dictionary
-      json_data = json.dumps(all_pages)
+      json_data = json.dumps(pdf_text)
+      #print(json_data)
 
       # convert JSON string to bytes-like obj
       bytes_string = bytes(json_data, 'utf-8')
@@ -125,23 +99,21 @@ class UserInput:
           if(word_count != 0):
             self.set_output(word_count, file_name, keyword)
 
-
+    print("found pdfs: ")
+    print(self.found_pdfs)
   def set_output(self, word_count, file_name, keyword):
-    exists = False
     if(len(self.found_pdfs) == 0):
         temp_dict = {file_name: {'keywords': {}}}
         temp_dict[file_name]['keywords'] = {keyword: word_count}
         self.found_pdfs.update(temp_dict)
     else:
-        for file, value in self.found_pdfs.items():
-            if(file == file_name):
-                self.found_pdfs[file_name]['keywords'][keyword] = word_count
-            else:
-                exists = True
-        if(exists):
+        if(file_name in self.found_pdfs):
+            self.found_pdfs[file_name]['keywords'][keyword] = word_count
+        else:
             temp_dict = {file_name: {'keywords': {}}}
             temp_dict[file_name]['keywords'] = {keyword: word_count}
             self.found_pdfs.update(temp_dict)
+
   #################################################################################
 
 

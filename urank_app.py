@@ -36,8 +36,8 @@ def select_topics(topic):
 def add_new_keyword(keyword):
   indexer_and_searcher.fill_term_list(keyword)
   indexer_and_searcher.search_files()
-  print("found results: ")
-  print(indexer_and_searcher.found_pdfs)
+  #print("found results: ")
+  #print(indexer_and_searcher.found_pdfs)
 
 def update_graphs():
   list_tabs = []
@@ -169,5 +169,6 @@ def open_pdf(n_clicks):
     os.startfile(r"C:\Users\rajna\Documents\urank\topics\thema1\output_NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf")
 
 if __name__ == '__main__':
-  # indexer_and_searcher.index_files()
+  #indexer_and_searcher.index_files()
   app.run_server(debug=False)
+
