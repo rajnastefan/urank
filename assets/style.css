@@ -17,6 +17,11 @@
     margin-right: 10px;
     margin-left: 10px;
 }
+
+.fi-star {
+    font-size: 24px;
+}
+
 .bookmark_history
 {
     background-color: #DAF0EB;
