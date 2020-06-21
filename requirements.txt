@@ -5,3 +5,7 @@ PyPDF2
 tika
 p2
 pdfplumber
+elasticsearch
+PyMuPDF
+fitz
+

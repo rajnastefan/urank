@@ -2,7 +2,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import pdfplumber
-from search import UserInput
+from urank_backend import UserInput
 from dash.dependencies import Input, Output
 #import fitz
 from utils import Utils
