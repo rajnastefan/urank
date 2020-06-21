@@ -5,48 +5,16 @@ import pdfplumber
 from search import UserInput
 from dash.dependencies import Input, Output
 import fitz
-import io
+from utils import Utils
 import os
+
 
 app = dash.Dash()
 app.title = "uRank"
 
+
 pdf_dict = {}
 indexer_and_searcher = UserInput()
-
-lista = {
-  "c++ guide": {
-    "keywords": {
-      "C++": 300,
-      "sql": 0,
-      "nvidia": 50
-    }
-  },
-  "sql guide": {
-    "keywords": {
-      "C++": 300,
-      "sql": 0,
-      "nvidia": 50
-    }
-  },
-  "nvidia gpu": {
-    "keywords": {
-      "C++": 300,
-      "sql": 0,
-      "nvidia": 50
-    }
-  }
-}
-
-only_keywords = []
-frequency_of_keywords = []
-topics = ['Doc 1', 'Doc 2', 'Doc 3', 'Doc 4', 'Doc 5']
-
-for x, y in lista.items():
-  only_keywords = y.get('keywords')
-
-for x, y in only_keywords.items():
-  frequency_of_keywords.append(y)
 
 
 def highlight_text_in_pdf(filename, words):
@@ -62,8 +30,6 @@ def highlight_text_in_pdf(filename, words):
 
 
 def select_topics(topic):
-  # indexer_and_searcher.select_topic(topic)
-  # print('test: ', indexer_and_searcher.pdf_dict)
   indexer_and_searcher.prepare_indexes_for_searching(topic)
 
 
@@ -73,126 +39,65 @@ def add_new_keyword(keyword):
   print("found results: ")
   print(indexer_and_searcher.found_pdfs)
 
-
-
-def update_plot(topic):
-  return html.Div([
-    dcc.Graph(
-      id='example-graph',
-      figure={
-        'data': [
-          dict(
-            x=[1, 2, 3],
-            y=[4, 1, 2],
-            type='bar',
-            text=y.get("keyword"),
-            name=topic
-          ) for i, y in lista.items()
-          # {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'SF'},
-          # {'x': [1, 2, 3], 'y': [2, 4, 5], 'type': 'bar', 'name': u'Montréal'},
-        ],
-        'layout': {
-          'title': 'Dash Data Visualization'
+def update_graphs():
+  list_tabs = []
+  for key in indexer_and_searcher.found_pdfs.keys():
+    list_tabs.append(
+    dcc.Tab(label=key.split(" ")[0], children=[
+      dcc.Graph(
+        figure={
+          'data': [
+            dict(
+              x=1,
+              y=[indexer_and_searcher.found_pdfs[key]["keywords"][name]],
+              type='bar',
+              text=name,
+              name=name
+            ) for name in indexer_and_searcher.found_pdfs[key]["keywords"]
+          ],
+          'layout': {
+            'title': key.split(" ")[0]
+          }
         }
-      }
-    )
-  ])
+      ),
+      html.Button('View', id='view_' + key.split(" ")[0], n_clicks=0),
+    ]))
+  return list_tabs
 
-
-topics = ['Doc 1', 'Doc 2']
 
 #######################
 # FRONTEND
 #######################
-print("")
 app.layout = \
   html.Div(className="big_container", children=[
     html.Title("uRank"),
-    html.Div(className="topic", children=[
+    html.Div(className="words", children=[
       html.P('Choose a topic'),
       # html.Br(),
       # html.Br(),
       dcc.Dropdown(
         id='topic-dropdown',
         options=[
-          {'label': 'C++ Books', 'value': 'C++ Books'},
-          {'label': 'SQL Books', 'value': 'SQL Books'},
-          {'label': 'nVidia GPU', 'value': 'nVidia GPU'}
+          {'label': 'thema1', 'value': 'thema1'},
+          {'label': 'thema2', 'value': 'thema2'},
+          {'label': 'thema3', 'value': 'thema3'}
         ],
       ),
-    ], style={"border": "1px solid black"}),
-    html.Div(className="words", children=[
       html.P('Choose a words'),
       dcc.Input(
         id="input_search",
         type="search",
-        value="nvidia",
-        placeholder="input word",
+        placeholder="search",
       ),
-      html.Button('Submit', id='submit-val', n_clicks=0),
+      html.Button('Submit', id='submit_val', n_clicks=0),
     ]),
 
     html.Div(className="middle_field", children=[
       html.Div(id="test1"),
+      html.Div(id="test2"),
       html.Div(id="histogram", className="results", children=[
-        dcc.Tabs([
-              dcc.Tab(label=topics[0], children=[
-                dcc.Graph(
-                  figure={
-                    'data': [
-                      dict(
-                        x=4,
-                        y=[y],
-                        type='bar',
-                        text=name,
-                        name=name
-                      ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
-                    ],
-                    'layout': {
-                      'title': 'C++'
-                    }
-                  }
-                ),
-                html.Button('View', id='view_' + topics[0], n_clicks=0),
-              ]),
-          dcc.Tab(label=topics[1], children=[
-            dcc.Graph(
-              figure={
-                'data': [
-                  dict(
-                    x=4,
-                    y=[y],
-                    type='bar',
-                    text=name,
-                    name=name
-                  ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
-                ],
-                'layout': {
-                  'title': 'C++'
-                }
-              }
-            ),
-            html.Button('View', id='view_' + topics[1], n_clicks=0),
-          ]),
-          dcc.Tab(label=topics[2], children=[
-            dcc.Graph(
-              figure={
-                'data': [
-                  dict(
-                    x=4,
-                    y=[y],
-                    type='bar',
-                    text=name,
-                    name=name
-                  ) for y, name in zip(frequency_of_keywords, only_keywords.keys())
-                ],
-                'layout': {
-                  'title': 'C++'
-                }
-              }
-            ),
-            html.Button('View', id='view_' + topics[2], n_clicks=0),
-          ])
+        dcc.Tabs(id="tabs", children=[
+
           ])
 
       ])
@@ -200,24 +105,69 @@ app.layout = \
 
     html.Div(className="bookmark_history", children=[
       html.Div(className="bookmark", children=[
-        html.P("Bookmarks D")
-      ], style={"border": "1px solid black"}),
-      html.Div(className="history", children=[
-        html.P("History E")
-      ], style={"border": "1px solid black"})
+        html.P("Bookmark")
+      ]),
+      html.Div(id="his", className="history", children=[html.P("History"),
+                                                        html.Button('Clear history', id='clear_history', style={"background-color": "#DAF0EB"}),
+                                   html.Div(id="history")])
     ])
   ])
 
 @app.callback(
-  Output(component_id='test1', component_property='children'),
+  Output(component_id='history', component_property='children'),
   [Input(component_id='input_search', component_property='value'),
-   Input(component_id='view_' + topics[0], component_property='n_clicks')])
-def open_pdf(value, n_clicks):
+  Input(component_id='submit_val', component_property='n_clicks'),
+   Input(component_id='clear_history', component_property='n_clicks')])
+def update_history(value, n_clicks, n_clicks2):
+  # if n_clicks2 is not None:
+  #   print(n_clicks2)
+  #   Utils.history_word.clear()
+  if n_clicks > Utils.click_count_temp:
+    if value is not None:
+      if value not in Utils.history_word:
+        Utils.history_word.append(value)
+      return [html.P(word) for word in Utils.history_word]
+    elif value == "":
+      [html.P(word) for word in Utils.history_word]
+  else:
+    [html.P(word) for word in Utils.history_word]
 
+@app.callback(
+  Output(component_id='tabs', component_property='children'),
+  [Input(component_id='input_search', component_property='value'),
+   Input(component_id='topic-dropdown', component_property='value'),
+   Input(component_id='submit_val', component_property='n_clicks')])
+def add_word_to_search(value, thema, n_clicks):
+  if n_clicks > Utils.click_count_temp:
+    if value is not None and thema is not None:
+      select_topics(thema)
+      add_new_keyword(value)
+      Utils.click_count_temp = n_clicks
+      return update_graphs()
+  else:
+    return [dcc.Tab(label="Doc 1", children=[
+                dcc.Graph(
+                  figure={
+                    'data': [
+                    ],
+                    'layout': {
+                      'title': 'Dummy'
+                    }
+                  }
+                )
+              ])]
+
+
+@app.callback(
+  Output(component_id='test1', component_property='children'),
+  [Input(component_id='view_NVIDIA', component_property='n_clicks') ] )
+def open_pdf(n_clicks):
+  #TODO: Dynamic implementation
+  print("usao")
   if(n_clicks > 0):
-    highlight_text_in_pdf("topics/tema1/NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf", [value])
-    os.startfile(r"C:\Users\rajna\Documents\urank\topics\tema1\output_NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf")
-
+    highlight_text_in_pdf("topics/thema1/NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf", Utils.history_word)
+    os.startfile(r"C:\Users\rajna\Documents\urank\topics\thema1\output_NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf")
 
 if __name__ == '__main__':
+  # indexer_and_searcher.index_files()
   app.run_server(debug=False)

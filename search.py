@@ -168,8 +168,7 @@ class UserInput:
     return all_words
 
   def open_file(self, topic_directory):
-    # topic_directory = "topics\\" + topic_directory
-    input_dir = os.path.join(os.getcwd(), topic_directory)
+    input_dir = os.path.join(os.getcwd(),  "topics",  topic_directory)
     for file in os.listdir(input_dir):
       if file[-4:] == ".pdf":
         try:
