@@ -123,7 +123,17 @@ app.layout = \
       html.Div(id="test2"),
       html.Div(id="histogram", className="results", children=[
         dcc.Tabs(id="tabs", children=[
-
+            dcc.Tab(label="Doc 1", children=[
+            dcc.Graph(
+              figure={
+                'data': [
+                ],
+                'layout': {
+                  'title': 'Dummy'
+                }
+              }
+            )
+            ])
         ]),
         html.Button('View', id='view', n_clicks=0),
         html.I(id='bookmark_doc_', n_clicks=0, className='fi-star')
@@ -171,7 +181,8 @@ def update_history(value, n_clicks, n_clicks2):
   Output(component_id='tabs', component_property='children'),
   [Input(component_id='input_search', component_property='value'),
    Input(component_id='topic-dropdown', component_property='value'),
-   Input(component_id='submit_val', component_property='n_clicks')])
+   Input(component_id='submit_val', component_property='n_clicks')],
+  prevent_initial_call=True)
 def add_word_to_search(value, thema, n_clicks):
   if n_clicks > Utils.click_count_temp:
     if value is not None and thema is not None:
@@ -179,18 +190,7 @@ def add_word_to_search(value, thema, n_clicks):
       add_new_keyword(value)
       Utils.click_count_temp = n_clicks
       return update_graphs()
-  else:
-    return [dcc.Tab(label="Doc 1", children=[
-      dcc.Graph(
-        figure={
-          'data': [
-          ],
-          'layout': {
-            'title': 'Dummy'
-          }
-        }
-      )
-    ])]
+
 
 
 @app.callback(
