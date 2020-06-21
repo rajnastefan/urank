@@ -4,12 +4,12 @@ import dash_html_components as html
 import pdfplumber
 from urank_backend import UserInput
 from dash.dependencies import Input, Output
-#import fitz
+import fitz
 from utils import Utils
 import os
-import dash_bootstrap_components as dbc
+# import dash_bootstrap_components as dbc
 
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash()
 app.title = "uRank"
 
 pdf_dict = {}
@@ -60,43 +60,30 @@ def update_graphs():
               'title': key.split(".pd")[0]
             }
           }
-        ),
-        html.Button('View', id='view_' + key.split(".pd")[0], n_clicks=0),
-        html.I(id='bookmark_doc_' + key.split(".pd")[0], n_clicks=0, className='fi-star'),
-
+        )
       ]))
   return list_tabs
 
-def get_input_parameters():
-  list_of_something = []
-  for key in indexer_and_searcher.found_pdfs.keys():
-    list_of_something.append(Input(component_id='bookmark_doc_' + key.split(".pd")[0], component_property='n_clicks'))
-  list_of_something.append(Input(component_id='tabs', component_property='value'))
-  return list_of_something
+
 
 @app.callback(
   Output(component_id='bookmark_list', component_property='children'),
-  get_input_parameters()
+  [Input(component_id='tabs', component_property='value'),
+   Input(component_id="bookmark_doc_", component_property="n_clicks")],
+  [dash.dependencies.State('tabs', 'value')]
 )
-def bookmark(*args):
-  print("Spaj0o value", *args)
-  # print("n clicks", n_clicks)
-  # print("bookmark clicks", Utils.bookmark_click_count)
-  # if n_clicks > Utils.bookmark_click_count:
-  #   print("tu")
-  #   if value is not None:
-  #     print("tu dole")
-  #     if value not in Utils.bookmarked_documents:
-  #       Utils.bookmarked_documents.append(value)
-  #       print("lista", Utils.bookmarked_documents)
-  #     print("Bookmarked stuff", [html.P(doc) for doc in Utils.bookmarked_documents])
-  #     Utils.bookmark_click_count = n_clicks
-  #     return [html.P(doc) for doc in Utils.bookmarked_documents]
-  #   elif value == "":
-  #     print("prazan label")
-  #     [html.P(doc) for doc in Utils.bookmarked_documents]
-  # else:
-  #   [html.P(doc) for doc in Utils.bookmarked_documents]
+def bookmark(value, n_clicks, state):
+  if n_clicks > Utils.bookmark_click_count:
+    if value is not None:
+      if value not in Utils.bookmarked_documents:
+        Utils.bookmarked_documents.append(value)
+        print("lista", Utils.bookmarked_documents)
+        Utils.bookmark_click_count = n_clicks
+        return [html.P(doc) for doc in Utils.bookmarked_documents]
+    elif value == "":
+      return [html.P(doc) for doc in Utils.bookmarked_documents]
+  else:
+    return [html.P(doc) for doc in Utils.bookmarked_documents]
 
 
 def select_themas():
@@ -137,7 +124,9 @@ app.layout = \
       html.Div(id="histogram", className="results", children=[
         dcc.Tabs(id="tabs", children=[
 
-        ])
+        ]),
+        html.Button('View', id='view', n_clicks=0),
+        html.I(id='bookmark_doc_', n_clicks=0, className='fi-star')
 
       ])
     ]),
@@ -145,7 +134,7 @@ app.layout = \
     html.Div(className="bookmark_history", children=[
       html.Div(className="bookmark", children=[
         html.P("Bookmark"),
-        html.Div(id="bookmark_list")
+        html.Div(id="bookmark_list", children=[html.P(doc) for doc in Utils.bookmarked_documents])
       ]),
       html.Div(id="his", className="history", children=[html.P("History"),
                                                         html.Button('Clear history', id='clear_history',
@@ -173,9 +162,9 @@ def update_history(value, n_clicks, n_clicks2):
         Utils.history_word.append(value)
       return [html.P(word) for word in Utils.history_word]
     elif value == "":
-      [html.P(word) for word in Utils.history_word]
+      return [html.P(word) for word in Utils.history_word]
   else:
-    [html.P(word) for word in Utils.history_word]
+   return [html.P(word) for word in Utils.history_word]
 
 
 @app.callback(
@@ -206,12 +195,11 @@ def add_word_to_search(value, thema, n_clicks):
 
 @app.callback(
   Output(component_id='test1', component_property='children'),
-  [Input(component_id='view_NVIDIA', component_property='n_clicks')])
-def open_pdf(n_clicks):
-  # TODO: Dynamic implementation
-  print("usao")
-  if (n_clicks > 0):
-    highlight_text_in_pdf("topics/thema1/NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf", Utils.history_word)
+  [Input(component_id='view', component_property='n_clicks'),
+   Input(component_id='tabs', component_property='value')])
+def open_pdf(n_clicks, value):
+  if n_clicks > 0:
+    highlight_text_in_pdf("topics/thema1/" + value + ".pdf", Utils.history_word)
     os.startfile(
       r"C:\Users\rajna\Documents\urank\topics\thema1\output_NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf")
 
