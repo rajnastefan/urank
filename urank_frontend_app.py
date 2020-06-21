@@ -1,12 +1,12 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import pdfplumber
 from urank_backend import UserInput
 from dash.dependencies import Input, Output
 import fitz
 from utils import Utils
 import os
+
 
 
 app = dash.Dash()
@@ -171,9 +171,12 @@ def open_pdf(n_clicks):
     highlight_text_in_pdf("topics/thema1/NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf", Utils.history_word)
     os.startfile(r"C:\Users\rajna\Documents\urank\topics\thema1\output_NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf")
 
+def save_bookmarks():
+    print("test")
+    print(indexer_and_searcher.get_all_bookmarks())
+    indexer_and_searcher.index_bookmarks(["book1", "book2"])
+
 if __name__ == '__main__':
   # indexer_and_searcher.index_files()
-  # app.run_server(debug=False)
-  print(indexer_and_searcher.get_all_bookmarks())
-  #indexer_and_searcher.index_bookmarks(["bookmark", "bookmark"])
+  app.run_server(debug=False)
 

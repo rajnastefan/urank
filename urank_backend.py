@@ -63,24 +63,22 @@ class UserInput:
 
     return bookmarks
 
-  def index_bookmarks(self, bookmarks):
+  def index_bookmarks(self, bookmark):
     if (self.check_first_index()):
-      index_value = self.get_last_index() + 1
+      index_value = self.get_last_index()
+      print(index_value)
     else:
-      index_value = 0
+      index_value = 1
 
-    for bookmark in bookmarks:
-      content = {"bookmark": bookmark}
-      json_data = json.dumps(content)
-      bytes_string = bytes(json_data, 'utf-8')
-      data = base64.b64encode(bytes_string).decode('ascii')
+    content = {"bookmark": bookmark}
+    json_data = json.dumps(content)
+    bytes_string = bytes(json_data, 'utf-8')
+    data = base64.b64encode(bytes_string).decode('ascii')
 
+    new_index = 'bookmark_index_' + str(index_value)
+    print(new_index)
+    self.es.index(id=new_index, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body = {'data': data})
 
-      index_value = index_value + 1
-      new_index = 'bookmark_index_' + str(index_value)
-      print(bookmark)
-
-      self.es.index(id=new_index, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body = {'data': data})
 
 
   def check_first_index(self):
@@ -94,9 +92,9 @@ class UserInput:
     count = 1
     while (not last):
       if (self.es.indices.exists(index="bookmark_index_" + str(count))):
-        last = True
-      else:
         count = count + 1
+      else:
+        last = True
 
     return count
 
