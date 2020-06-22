@@ -7,9 +7,9 @@ from dash.dependencies import Input, Output
 import fitz
 from utils import Utils
 import os
-# import dash_bootstrap_components as dbc
+import dash_bootstrap_components as dbc
 
-app = dash.Dash()#external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "uRank"
 
 pdf_dict = {}
@@ -211,9 +211,10 @@ def open_pdf(n_clicks, topic_value, value):
   if topic_value is not None:
     highlighted_document = os.getcwd() + '/highlighted_pdfs' + '/output_' + value + ".pdf"
     input_dir = os.path.join(highlighted_document)
-  if n_clicks > 0:
+  if n_clicks > Utils.highlight_pdf_click_count:
     highlight_text_in_pdf("topics/thema1/" + value + ".pdf", Utils.history_word)
     os.startfile(input_dir)
+    Utils.highlight_pdf_click_count = n_clicks
 
 
 if __name__ == '__main__':
