@@ -47,9 +47,10 @@ class UserInput:
   #----------------new implementation------------------------------------------------#
 
   def clear_bookmarks_indices(self):
+    print(self.bookmark_indexes)
     for bookmark in  self.bookmark_indexes:
       self.es.delete(id = bookmark, index=bookmark, doc_type='my_type')
-      self.es.indices.delete(index="bookmark_index_1", ignore=[400, 404])
+      self.es.indices.delete(index=bookmark, ignore=[400, 404])
       self.bookmarkes = []
       self.bookmark_indexes = []
 
@@ -67,12 +68,13 @@ class UserInput:
       count = 1
       while (not last):
         print(count)
+
         current_index = "bookmark_index_" + str(count)
-        self.es.indices.refresh()
+        print(current_index)
         if (self.es.indices.exists(index=current_index)):
-          self.es.indices.refresh(index=current_index)
-          doc = self.es.get(index=current_index, doc_type='my_type', id=current_index)
+          doc = self.es.get(index=current_index, id=current_index)
           bookmarks.append(doc['_source']['attachment']['content'])
+          print(doc['_source']['attachment']['content'])
           bookmarks_indexes.append(current_index)
           count = count + 1
         else:
