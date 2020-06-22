@@ -270,5 +270,5 @@ def open_pdf(n_clicks, topic_value, value):
 
 
 if __name__ == '__main__':
-  # indexer_and_searcher.index_files()
+  indexer_and_searcher.index_files()
   app.run_server(debug=False)

@@ -131,7 +131,9 @@ class UserInput:
       for file in os.listdir(input_dir):
         content = self.pdf_operations(os.path.join(theme, file))
         index_value = index_value + 1
+        print(theme)
         new_index = theme.split(theme[6])[1] + '_index_' + str(index_value)
+        print(new_index)
         self.es.index(id = new_index, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={"data": content})
 
   def prepare_indexes_for_searching(self, topic):
