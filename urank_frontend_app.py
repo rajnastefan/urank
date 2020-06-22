@@ -7,9 +7,9 @@ from dash.dependencies import Input, Output
 import fitz
 from utils import Utils
 import os
-# import dash_bootstrap_components as dbc
+import dash_bootstrap_components as dbc
 
-app = dash.Dash()
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "uRank"
 
 pdf_dict = {}
@@ -65,14 +65,19 @@ def update_graphs():
   return list_tabs
 
 
-
 @app.callback(
   Output(component_id='bookmark_list', component_property='children'),
   [Input(component_id='tabs', component_property='value'),
-   Input(component_id="bookmark_doc_", component_property="n_clicks")],
+   Input(component_id="bookmark_doc_", component_property='n_clicks'),
+   Input(component_id='clear_bookmark', component_property='n_clicks'),
+   ],
   [dash.dependencies.State('tabs', 'value')]
 )
-def bookmark(value, n_clicks, state):
+def bookmark(value, n_clicks, n_clicks2, state):
+  if n_clicks2 is not None:
+    print(n_clicks2)
+    Utils.bookmarked_documents.clear()
+    return [html.P(doc) for doc in Utils.bookmarked_documents]
   if n_clicks > Utils.bookmark_click_count:
     if value is not None:
       if value not in Utils.bookmarked_documents:
@@ -123,7 +128,7 @@ app.layout = \
       html.Div(id="test2"),
       html.Div(id="histogram", className="results", children=[
         dcc.Tabs(id="tabs", children=[
-            dcc.Tab(label="Doc 1", children=[
+          dcc.Tab(label="Doc 1", children=[
             dcc.Graph(
               figure={
                 'data': [
@@ -133,7 +138,7 @@ app.layout = \
                 }
               }
             )
-            ])
+          ])
         ]),
         html.Button('View', id='view', n_clicks=0),
         html.I(id='bookmark_doc_', n_clicks=0, className='fi-star')
@@ -144,6 +149,8 @@ app.layout = \
     html.Div(className="bookmark_history", children=[
       html.Div(className="bookmark", children=[
         html.P("Bookmark"),
+        html.Button('Clear bookmarks', id='clear_bookmark',
+                    style={"background-color": "#DAF0EB"}),
         html.Div(id="bookmark_list", children=[html.P(doc) for doc in Utils.bookmarked_documents])
       ]),
       html.Div(id="his", className="history", children=[html.P("History"),
@@ -154,18 +161,16 @@ app.layout = \
   ])
 
 
-
-
-
 @app.callback(
   Output(component_id='history', component_property='children'),
   [Input(component_id='input_search', component_property='value'),
    Input(component_id='submit_val', component_property='n_clicks'),
    Input(component_id='clear_history', component_property='n_clicks')])
 def update_history(value, n_clicks, n_clicks2):
-  # if n_clicks2 is not None:
-  #   print(n_clicks2)
-  #   Utils.history_word.clear()
+  if n_clicks2 is not None:
+    print(n_clicks2)
+    Utils.history_word.clear()
+    return [html.P(word) for word in Utils.history_word]
   if n_clicks > Utils.click_count_temp:
     if value is not None:
       if value not in Utils.history_word:
@@ -174,7 +179,7 @@ def update_history(value, n_clicks, n_clicks2):
     elif value == "":
       return [html.P(word) for word in Utils.history_word]
   else:
-   return [html.P(word) for word in Utils.history_word]
+    return [html.P(word) for word in Utils.history_word]
 
 
 @app.callback(
@@ -192,18 +197,19 @@ def add_word_to_search(value, thema, n_clicks):
       return update_graphs()
 
 
-
 @app.callback(
   Output(component_id='test1', component_property='children'),
   [Input(component_id='view', component_property='n_clicks'),
+   Input(component_id='topic-dropdown', component_property='value'),
    Input(component_id='tabs', component_property='value')])
-def open_pdf(n_clicks, value):
+def open_pdf(n_clicks, topic_value, value):
+  if topic_value is not None:
+    topic_value = topic_value + '/' + value + ".pdf"
+    input_dir = os.path.join(os.getcwd(), "topics", topic_value)
   if n_clicks > 0:
     highlight_text_in_pdf("topics/thema1/" + value + ".pdf", Utils.history_word)
-    os.startfile(
-      r"C:\Users\rajna\Documents\urank\topics\thema1\output_NVIDIA - Turing GPU Architecture - Graphics Reinveted.pdf")
-
+    os.startfile(input_dir)
 
 if __name__ == '__main__':
-  # indexer_and_searcher.index_files()
+  indexer_and_searcher.index_files()
   app.run_server(debug=False)
