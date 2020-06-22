@@ -157,8 +157,8 @@ class UserInput:
           if(word_count != 0):
             self.set_output(word_count, file_name, keyword)
 
-    print("found pdfs: ")
-    print(self.found_pdfs)
+    # print("found pdfs: ")
+    # print(self.found_pdfs)
   def set_output(self, word_count, file_name, keyword):
     if(len(self.found_pdfs) == 0):
         temp_dict = {file_name: {'keywords': {}}}

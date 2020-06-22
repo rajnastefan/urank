@@ -31,6 +31,7 @@ def select_themas():
 
   return return_list
 
+
 # def update_fig(value):
 # y = []
 # x = []
@@ -112,6 +113,10 @@ def select_themas():
   return return_list
 
 
+def open_pdf_test():
+  print("usli")
+
+
 #######################
 # FRONTEND
 #######################
@@ -171,7 +176,11 @@ app.layout = \
         html.H1("Bookmarks", className='center-header'),
         html.Button('Clear bookmarks', id='clear_bookmark', className='clear-bookmark', n_clicks=0
                     ),
-        html.Div(id="bookmark_list", children=[html.P(doc) for doc in Utils.bookmarked_documents])
+        html.Div(id="bookmark_list", children=[
+          dbc.ListGroup(id="bookmark_group"
+                        )
+        ])
+
       ]),
       html.Div(id="his", className="history", children=[html.H1("History of words", className='center-header'),
                                                         html.Button('Clear history', id='clear_history',
@@ -192,15 +201,20 @@ app.layout = \
 #       return update_fig(value)
 
 
+# @app.callback(Output(component_id='his', component_property='children'),
+#               [Input(component_id='bookmarks_nav', component_property='n_clicks')])
+# def test_nav(*args):
+#   print(args)
 
 @app.callback(
-  Output(component_id='bookmark_list', component_property='children'),
+  Output(component_id='bookmark_group', component_property='children'),
   [Input(component_id='tabs', component_property='value'),
    Input(component_id="bookmark_doc_", component_property='n_clicks'),
    Input(component_id='clear_bookmark', component_property='n_clicks'),
+   Input(component_id='topic-dropdown', component_property='value')
    ],
 )
-def bookmark(value, n_clicks, n_clicks2):
+def bookmark(value, n_clicks, n_clicks2, topic):
   if n_clicks2 > Utils.bookmark_click_count_clear:
     Utils.bookmarked_documents.clear()
     Utils.bookmark_click_count_clear = n_clicks2
@@ -210,12 +224,11 @@ def bookmark(value, n_clicks, n_clicks2):
       if value not in Utils.bookmarked_documents:
         Utils.bookmarked_documents.append(value)
         Utils.bookmark_click_count = n_clicks
-      return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
+      return [dbc.ListGroupItem(html.A(doc, href='/assets/topics/' + topic + '/' + doc + '.pdf'), className='rounded-bookmark') for doc in Utils.bookmarked_documents]
     elif value == "":
-      return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
+      return [dbc.ListGroupItem(html.A(doc, href='/assets/topics/' + topic + '/' + doc + '.pdf'), className='rounded-bookmark') for doc in Utils.bookmarked_documents]
   else:
-    return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
-
+    return [dbc.ListGroupItem(html.A(doc, href='/assets/topics/' + topic + '/' + doc + '.pdf'), className='rounded-bookmark') for doc in Utils.bookmarked_documents]
 
 
 @app.callback(
@@ -265,10 +278,11 @@ def open_pdf(n_clicks, topic_value, value):
     input_dir = os.path.join(highlighted_document)
   if n_clicks > Utils.highlight_pdf_click_count:
     highlight_text_in_pdf("topics/" + topic_value + "/" + value + ".pdf", Utils.history_word)
+
     os.startfile(input_dir)
     Utils.highlight_pdf_click_count = n_clicks
 
 
 if __name__ == '__main__':
-  #indexer_and_searcher.index_files()
+  # indexer_and_searcher.index_files()
   app.run_server(debug=False)
