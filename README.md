@@ -1,4 +1,4 @@
------------------------------------------------------------------------------Urank documentation for Windows-------------------------------------------------------------------------------
+#Urank documentation for Windows
 #Prerquisites:
     python
 
@@ -22,6 +22,8 @@ docker run -d -p 9200:9200 elasticsearch-ingest
 
 #use command below to find and copy Container ID and paste instead of <container_id> in next command
 docker ps --filter status=running
+
+#use id and paste into following command
 docker  run --rm --link <container_id>:elasticsearch --name kibana -p 5601:5601 docker.elastic.co/kibana/kibana:6.8.1
 
 #open browser and type localhost:5601 and check KIBANA UI

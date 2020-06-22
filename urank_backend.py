@@ -13,6 +13,7 @@ STARTING_PAGE = 21
 
 
 class UserInput:
+  bookmarkes = []
   list_of_terms = []
   pdf_dict = {}
   topic = None
@@ -35,12 +36,69 @@ class UserInput:
 
 
   def __init__(self):
+    self.bookmarkes = []
     self.list_of_terms = []
     self.pdf_indexes = {}
     self.found_pdfs = {}
     self.topic = None
 
   #----------------new implementation------------------------------------------------#
+  def get_all_bookmarks(self):
+    print("test")
+    bookmarks = []
+    if not(self.check_first_index()):
+      return []
+    else:
+      last = False
+      count = 1
+      while (not last):
+        print(count)
+        current_index = "bookmark_index_" + str(count)
+        if (self.es.indices.exists(index=current_index)):
+          doc = self.es.get(index=current_index, doc_type='my_type', id=current_index)
+          bookmarks.append(doc['_source']['attachment']['content'])
+          count = count + 1
+        else:
+          last = True
+
+    return bookmarks
+
+  def index_bookmarks(self, bookmark):
+    if (self.check_first_index()):
+      index_value = self.get_last_index()
+      print(index_value)
+    else:
+      index_value = 1
+
+    content = {"bookmark": bookmark}
+    json_data = json.dumps(content)
+    bytes_string = bytes(json_data, 'utf-8')
+    data = base64.b64encode(bytes_string).decode('ascii')
+
+    new_index = 'bookmark_index_' + str(index_value)
+    print(new_index)
+    self.es.index(id=new_index, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body = {'data': data})
+
+
+
+  def check_first_index(self):
+    if(self.es.indices.exists(index="bookmark_index_1")):
+      return True
+    else:
+      return False
+
+  def get_last_index(self):
+    last = False
+    count = 1
+    while (not last):
+      if (self.es.indices.exists(index="bookmark_index_" + str(count))):
+        count = count + 1
+      else:
+        last = True
+
+    return count
+
+
   def pdf_operations(self, filename):
       pdf_text = parser.from_file(filename)
 
@@ -73,7 +131,7 @@ class UserInput:
       for file in os.listdir(input_dir):
         content = self.pdf_operations(os.path.join(theme, file))
         index_value = index_value + 1
-        new_index = theme.split("\\")[1] + '_index_' + str(index_value)
+        new_index = theme.split(theme[6])[1] + '_index_' + str(index_value)
         self.es.index(id = new_index, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={"data": content})
 
   def prepare_indexes_for_searching(self, topic):
