@@ -8,6 +8,7 @@ class Utils:
     history_word = []
     bookmarked_documents = []
     highlight_pdf_click_count = 0
+    list_of_found_words = []
 
     @staticmethod
     def get_input_parameters(keys):

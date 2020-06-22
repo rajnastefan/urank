@@ -43,6 +43,7 @@ class UserInput:
     self.pdf_indexes = {}
     self.found_pdfs = {}
     self.topic = None
+    self.list_of_found_words = []
 
   #----------------new implementation------------------------------------------------#
 
@@ -176,6 +177,8 @@ class UserInput:
           word_count = sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(keyword), doc['_source']['attachment']['content'], re.IGNORECASE))
           if(word_count != 0):
             self.set_output(word_count, file_name, keyword)
+            if keyword not in self.list_of_found_words:
+              self.list_of_found_words.append(keyword)
 
     # print("found pdfs: ")
     # print(self.found_pdfs)
