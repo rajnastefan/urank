@@ -17,10 +17,14 @@ pdf_dict = {}
 indexer_and_searcher = UserInput()
 
 
-def save_bookmarks():
-  print("test")
-  print(indexer_and_searcher.get_all_bookmarks())
-  indexer_and_searcher.index_bookmarks(["book1", "book2"])
+def save_bookmarks(bookmark):
+  #TODO connect with backend
+  indexer_and_searcher.index_bookmark(bookmark)
+
+
+def clear_bookmarks():
+  # TODO connect with backend
+  indexer_and_searcher.clear_bookmarks_indices()
 
 
 def select_themas():
@@ -271,4 +275,5 @@ def open_pdf(n_clicks, topic_value, value):
 
 if __name__ == '__main__':
   #indexer_and_searcher.index_files()
+  indexer_and_searcher.init_bookmarks()
   app.run_server(debug=False)
