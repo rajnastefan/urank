@@ -85,11 +85,11 @@ def bookmark(value, n_clicks, n_clicks2, state):
         Utils.bookmarked_documents.append(value)
         print("lista", Utils.bookmarked_documents)
         Utils.bookmark_click_count = n_clicks
-        return [html.P(doc) for doc in Utils.bookmarked_documents]
+        return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
     elif value == "":
-      return [html.P(doc) for doc in Utils.bookmarked_documents]
+      return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
   else:
-    return [html.P(doc) for doc in Utils.bookmarked_documents]
+    return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
 
 
 def select_themas():
@@ -110,22 +110,24 @@ app.layout = \
 
     html.Div(className="bookmark_history", children=[
       html.Div(className="bookmark", children=[
-        html.H1('Choose a topic'),
+        html.H1('Choose a topic', className='center-header'),
 
         # html.Br(),
         dcc.Dropdown(
           id='topic-dropdown',
           options=select_themas(),
+          className='round-dropdown'
         ),
       ]),
       html.Div(id="words_search", className="history", children=[
-        html.H1('Type in words'),
+        html.H1('Type in words', className='center-header'),
         dcc.Input(
           id="input_search",
           type="search",
-          placeholder="search",
+          placeholder="Search",
+          className="search"
         ),
-        html.Button('Submit', id='submit_val', n_clicks=0),
+        html.I(id='submit_val', n_clicks=0, className='fi-page-search'),
       ])
     ]),
     html.Div(className="middle_field", children=[
@@ -153,14 +155,14 @@ app.layout = \
 
     html.Div(className="bookmark_history", children=[
       html.Div(className="bookmark", children=[
-        html.H1("Bookmark"),
-        html.Button('Clear bookmarks', id='clear_bookmark',
-                    style={"background-color": "#DAF0EB"}),
+        html.H1("Bookmarks", className='center-header'),
+        html.Button('Clear bookmarks', id='clear_bookmark', className='clear-bookmark'
+                    ),
         html.Div(id="bookmark_list", children=[html.P(doc) for doc in Utils.bookmarked_documents])
       ]),
-      html.Div(id="his", className="history", children=[html.H1("History"),
+      html.Div(id="his", className="history", children=[html.H1("History of words", className='center-header'),
                                                         html.Button('Clear history', id='clear_history',
-                                                                    style={"background-color": "#DAF0EB"}),
+                                                                    className='clear-history'),
                                                         html.Div(id="history")])
     ])
   ])
@@ -180,11 +182,11 @@ def update_history(value, n_clicks, n_clicks2):
     if value is not None:
       if value not in Utils.history_word:
         Utils.history_word.append(value)
-      return [html.P(word) for word in Utils.history_word]
+      return [html.P(word, className='rounded-history') for word in Utils.history_word]
     elif value == "":
-      return [html.P(word) for word in Utils.history_word]
+      return [html.P(word, className='rounded-history') for word in Utils.history_word]
   else:
-    return [html.P(word) for word in Utils.history_word]
+    return [html.P(word, className='rounded-history') for word in Utils.history_word]
 
 
 @app.callback(
