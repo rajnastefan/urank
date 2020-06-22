@@ -106,23 +106,27 @@ def select_themas():
 app.layout = \
   html.Div(className="big_container", children=[
     html.Title("uRank"),
-    html.Div(className="words", children=[
-      html.P('Choose a topic'),
-      # html.Br(),
-      # html.Br(),
-      dcc.Dropdown(
-        id='topic-dropdown',
-        options=select_themas(),
-      ),
-      html.P('Select words'),
-      dcc.Input(
-        id="input_search",
-        type="search",
-        placeholder="search",
-      ),
-      html.Button('Submit', id='submit_val', n_clicks=0),
-    ]),
 
+    html.Div(className="bookmark_history", children=[
+      html.Div(className="bookmark", children=[
+        html.H1('Choose a topic'),
+
+        # html.Br(),
+        dcc.Dropdown(
+          id='topic-dropdown',
+          options=select_themas(),
+        ),
+      ]),
+      html.Div(id="words_search", className="history", children=[
+        html.H1('Type in words'),
+        dcc.Input(
+          id="input_search",
+          type="search",
+          placeholder="search",
+        ),
+        html.Button('Submit', id='submit_val', n_clicks=0),
+    ])
+  ]),
     html.Div(className="middle_field", children=[
       html.Div(id="test1"),
       html.Div(id="test2"),
@@ -148,12 +152,12 @@ app.layout = \
 
     html.Div(className="bookmark_history", children=[
       html.Div(className="bookmark", children=[
-        html.P("Bookmark"),
+        html.H1("Bookmark"),
         html.Button('Clear bookmarks', id='clear_bookmark',
                     style={"background-color": "#DAF0EB"}),
         html.Div(id="bookmark_list", children=[html.P(doc) for doc in Utils.bookmarked_documents])
       ]),
-      html.Div(id="his", className="history", children=[html.P("History"),
+      html.Div(id="his", className="history", children=[html.H1("History"),
                                                         html.Button('Clear history', id='clear_history',
                                                                     style={"background-color": "#DAF0EB"}),
                                                         html.Div(id="history")])
@@ -204,7 +208,7 @@ def add_word_to_search(value, thema, n_clicks):
    Input(component_id='tabs', component_property='value')])
 def open_pdf(n_clicks, topic_value, value):
   if topic_value is not None:
-    topic_value = topic_value + '/' + value + ".pdf"
+    topic_value = topic_value + '/output_' + value + ".pdf"
     input_dir = os.path.join(os.getcwd(), "topics", topic_value)
   if n_clicks > 0:
     highlight_text_in_pdf("topics/thema1/" + value + ".pdf", Utils.history_word)
