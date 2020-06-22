@@ -19,6 +19,7 @@ class UserInput:
   pdf_dict = {}
   topic = None
   found_pdfs = {}
+  pdfs_with_most_occured_words = {}
   pdf_indexes = {}
   es = Elasticsearch([{'host':'localhost','port':9200}])
   print(es.cat.health())
@@ -42,6 +43,7 @@ class UserInput:
     self.list_of_terms = []
     self.pdf_indexes = {}
     self.found_pdfs = {}
+    self.pdfs_with_most_occured_words = {}
     self.topic = None
     self.list_of_found_words = []
 
@@ -168,6 +170,7 @@ class UserInput:
 
 
   def search_files(self):
+    temp_dictionary = {}
     for keyword in self.list_of_terms:
       for file_name, current_index in self.pdf_indexes.items():
         self.es.indices.refresh(index=current_index)
@@ -176,24 +179,62 @@ class UserInput:
           doc = self.es.get(index=current_index, doc_type='my_type', id=current_index)
           word_count = sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(keyword), doc['_source']['attachment']['content'], re.IGNORECASE))
           if(word_count != 0):
-            self.set_output(word_count, file_name, keyword)
+            temp_dict = self.set_output(word_count, file_name, keyword)
+            temp_dictionary.update(temp_dict)
             if keyword not in self.list_of_found_words:
-              self.list_of_found_words.append(keyword)
+                self.list_of_found_words.append(keyword)
 
-    # print("found pdfs: ")
-    # print(self.found_pdfs)
+
+    print("found pdfs: ")
+    print(self.found_pdfs)
+
+
+    if(len(temp_dictionary) > 0):
+      temporary_dictionary = self.find_most_occured_words(temp_dictionary)
+      if (len(temporary_dictionary) > 0):
+        self.pdfs_with_most_occured_words.update(temporary_dictionary)
+
+    print("top pdfs: ")
+    print(self.pdfs_with_most_occured_words)
+
+
   def set_output(self, word_count, file_name, keyword):
+    temp_dict = {file_name: {'keywords': {}}}
     if(len(self.found_pdfs) == 0):
-        temp_dict = {file_name: {'keywords': {}}}
         temp_dict[file_name]['keywords'] = {keyword: word_count}
         self.found_pdfs.update(temp_dict)
     else:
         if(file_name in self.found_pdfs):
             self.found_pdfs[file_name]['keywords'][keyword] = word_count
+            temp_dict[file_name]['keywords'] = {keyword: word_count}
         else:
-            temp_dict = {file_name: {'keywords': {}}}
             temp_dict[file_name]['keywords'] = {keyword: word_count}
             self.found_pdfs.update(temp_dict)
+
+    return temp_dict
+
+  def find_most_occured_words(self, temp_dict):
+
+    word_to_insert = None
+    count_to_insert = None
+    file_to_insert = None
+
+    prev_count = 0
+    for pdf, pdf_key in temp_dict.items():
+      for keywords, values in pdf_key.items():
+        for word, count in values.items():
+          print(count)
+          print(prev_count)
+          if(count > prev_count):
+            word_to_insert = word
+            count_to_insert = count
+            file_to_insert = pdf
+            prev_count = count
+
+    temp_dict = {file_to_insert: {'keywords': {}}}
+    temp_dict[file_to_insert]['keywords'] = {word_to_insert: count_to_insert}
+    return temp_dict
+
 
   #################################################################################
 
