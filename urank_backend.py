@@ -13,6 +13,7 @@ STARTING_PAGE = 21
 
 
 class UserInput:
+  bookmark_indexes = []
   bookmarkes = []
   list_of_terms = []
   pdf_dict = {}
@@ -37,33 +38,51 @@ class UserInput:
 
   def __init__(self):
     self.bookmarkes = []
+    self.bookmark_indexes = []
     self.list_of_terms = []
     self.pdf_indexes = {}
     self.found_pdfs = {}
     self.topic = None
 
   #----------------new implementation------------------------------------------------#
+
+  def clear_bookmarks_indices(self):
+    print(self.bookmark_indexes)
+    for bookmark in  self.bookmark_indexes:
+      self.es.delete(id = bookmark, index=bookmark, doc_type='my_type')
+      self.es.indices.delete(index=bookmark, ignore=[400, 404])
+      self.bookmarkes = []
+      self.bookmark_indexes = []
+
+  def init_bookmarks(self):
+    self.bookmarkes, self.bookmark_indexes = self.get_all_bookmarks()
+
+
   def get_all_bookmarks(self):
-    print("test")
     bookmarks = []
+    bookmarks_indexes = []
     if not(self.check_first_index()):
-      return []
+      return [], []
     else:
       last = False
       count = 1
       while (not last):
         print(count)
+
         current_index = "bookmark_index_" + str(count)
+        print(current_index)
         if (self.es.indices.exists(index=current_index)):
-          doc = self.es.get(index=current_index, doc_type='my_type', id=current_index)
+          doc = self.es.get(index=current_index, id=current_index)
           bookmarks.append(doc['_source']['attachment']['content'])
+          print(doc['_source']['attachment']['content'])
+          bookmarks_indexes.append(current_index)
           count = count + 1
         else:
           last = True
 
-    return bookmarks
+    return bookmarks, bookmarks_indexes
 
-  def index_bookmarks(self, bookmark):
+  def index_bookmark(self, bookmark):
     if (self.check_first_index()):
       index_value = self.get_last_index()
       print(index_value)
@@ -76,7 +95,8 @@ class UserInput:
     data = base64.b64encode(bytes_string).decode('ascii')
 
     new_index = 'bookmark_index_' + str(index_value)
-    print(new_index)
+    self.bookmark_indexes.append(new_index)
+    self.bookmarkes.append(content)
     self.es.index(id=new_index, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body = {'data': data})
 
 
