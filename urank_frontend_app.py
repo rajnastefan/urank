@@ -103,32 +103,6 @@ def update_graphs():
   return list_tabs
 
 
-@app.callback(
-  Output(component_id='bookmark_list', component_property='children'),
-  [Input(component_id='tabs', component_property='value'),
-   Input(component_id="bookmark_doc_", component_property='n_clicks'),
-   Input(component_id='clear_bookmark', component_property='n_clicks'),
-   ],
-  [dash.dependencies.State('tabs', 'value')]
-)
-def bookmark(value, n_clicks, n_clicks2, state):
-  if n_clicks2 is not None:
-    print(n_clicks2)
-    Utils.bookmarked_documents.clear()
-    return [html.P(doc) for doc in Utils.bookmarked_documents]
-  if n_clicks > Utils.bookmark_click_count:
-    if value is not None:
-      if value not in Utils.bookmarked_documents:
-        Utils.bookmarked_documents.append(value)
-        print("lista", Utils.bookmarked_documents)
-        Utils.bookmark_click_count = n_clicks
-        return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
-    elif value == "":
-      return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
-  else:
-    return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
-
-
 def select_themas():
   return_list = []
   for subdir, dirs, files in os.walk("topics"):
@@ -195,13 +169,13 @@ app.layout = \
     html.Div(className="bookmark_history", children=[
       html.Div(className="bookmark", children=[
         html.H1("Bookmarks", className='center-header'),
-        html.Button('Clear bookmarks', id='clear_bookmark', className='clear-bookmark'
+        html.Button('Clear bookmarks', id='clear_bookmark', className='clear-bookmark', n_clicks=0
                     ),
         html.Div(id="bookmark_list", children=[html.P(doc) for doc in Utils.bookmarked_documents])
       ]),
       html.Div(id="his", className="history", children=[html.H1("History of words", className='center-header'),
                                                         html.Button('Clear history', id='clear_history',
-                                                                    className='clear-history'),
+                                                                    className='clear-history', n_clicks=0),
                                                         html.Div(id="history")])
     ])
   ])
@@ -218,15 +192,41 @@ app.layout = \
 #       return update_fig(value)
 
 
+
+@app.callback(
+  Output(component_id='bookmark_list', component_property='children'),
+  [Input(component_id='tabs', component_property='value'),
+   Input(component_id="bookmark_doc_", component_property='n_clicks'),
+   Input(component_id='clear_bookmark', component_property='n_clicks'),
+   ],
+)
+def bookmark(value, n_clicks, n_clicks2):
+  if n_clicks2 > Utils.bookmark_click_count_clear:
+    Utils.bookmarked_documents.clear()
+    Utils.bookmark_click_count_clear = n_clicks2
+    return [html.P(doc) for doc in Utils.bookmarked_documents]
+  if n_clicks > Utils.bookmark_click_count:
+    if value is not None:
+      if value not in Utils.bookmarked_documents:
+        Utils.bookmarked_documents.append(value)
+        Utils.bookmark_click_count = n_clicks
+      return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
+    elif value == "":
+      return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
+  else:
+    return [html.P(doc, className='rounded-bookmark') for doc in Utils.bookmarked_documents]
+
+
+
 @app.callback(
   Output(component_id='history', component_property='children'),
   [Input(component_id='input_search', component_property='value'),
    Input(component_id='submit_val', component_property='n_clicks'),
    Input(component_id='clear_history', component_property='n_clicks')])
 def update_history(value, n_clicks, n_clicks2):
-  if n_clicks2 is not None:
-    print(n_clicks2)
+  if n_clicks2 > Utils.history_click_count:
     Utils.history_word.clear()
+    Utils.history_click_count = n_clicks2
     return [html.P(word) for word in Utils.history_word]
   if n_clicks > Utils.click_count_temp:
     if value is not None:
@@ -264,11 +264,11 @@ def open_pdf(n_clicks, topic_value, value):
     highlighted_document = os.getcwd() + '/highlighted_pdfs' + '/output_' + value + ".pdf"
     input_dir = os.path.join(highlighted_document)
   if n_clicks > Utils.highlight_pdf_click_count:
-    highlight_text_in_pdf("topics/thema1/" + value + ".pdf", Utils.history_word)
+    highlight_text_in_pdf("topics/" + topic_value + "/" + value + ".pdf", Utils.history_word)
     os.startfile(input_dir)
     Utils.highlight_pdf_click_count = n_clicks
 
 
 if __name__ == '__main__':
-  indexer_and_searcher.index_files()
+  #indexer_and_searcher.index_files()
   app.run_server(debug=False)

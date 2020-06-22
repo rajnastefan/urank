@@ -3,6 +3,8 @@ from dash.dependencies import Input
 class Utils:
     click_count_temp = 0
     bookmark_click_count = 0
+    bookmark_click_count_clear = 0
+    history_click_count = 0
     history_word = []
     bookmarked_documents = []
     highlight_pdf_click_count = 0

@@ -131,9 +131,7 @@ class UserInput:
       for file in os.listdir(input_dir):
         content = self.pdf_operations(os.path.join(theme, file))
         index_value = index_value + 1
-        print(theme)
         new_index = theme.split(theme[6])[1] + '_index_' + str(index_value)
-        print(new_index)
         self.es.index(id = new_index, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body={"data": content})
 
   def prepare_indexes_for_searching(self, topic):
@@ -213,7 +211,7 @@ class UserInput:
           print("[ERROR] loading " + file)
 
   def extract_words(self, path_to_file):
-    pdf = pdfplumber.open("topics/thema1/" + path_to_file)
+    pdf = pdfplumber.open("topics/gpu/" + path_to_file)
     list_of_words = self.extract_and_print_text(pdf)
     return list_of_words
   #################################################################################
