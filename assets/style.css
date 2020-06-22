@@ -1,17 +1,16 @@
-.big_container
-{
+.big_container {
     display: flex;
 }
-.words
-{
+
+.words {
     height: 100vh;
     width: 20%;
     border-bottom: thin lightgrey solid;
-    background-color: #DAF0EB;
+    background-color: #E4E4E5;
 }
-.middle_field
-{
-    background-color: #DAF0EB;
+
+.middle_field {
+    background-color: #E4E4E5;
     width: 60%;
     height: 200vh;
     margin-right: 10px;
@@ -22,14 +21,73 @@
     font-size: 24px;
 }
 
-.bookmark_history
-{
-    background-color: #DAF0EB;
+.fi-page-search {
+    padding-left: 5px;
+    position: absolute;
+    top: 52.2%;
+    font-size: 30px;
+}
+
+.rounded-bookmark {
+    background-color: #F8F7FF;
+    font-weight: bold;
+    border-radius: 20px !important;
+    width: auto;
+    height: auto;
+    padding: 5px 20px 5px 5px;
+}
+
+.Select-control {
+    border-radius: 20px !important;
+}
+
+.search {
+    width: inherit;
+    border-radius: 20px !important;
+    padding: 5px 20px 5px 20px;
+}
+
+.rounded-history {
+    background-color: #F8F7FF;
+    font-weight: bold;
+    border-radius: 20px !important;
+    width: auto;
+    height: auto;
+    padding: 5px 20px 5px 5px;
+    display: inline-block;
+    align-items: center;
+    justify-content: center
+
+}
+
+.bookmark_history {
+    background-color: #E4E4E5;
     height: 100vh;
     width: 20%;
 }
-.documents
-{
+
+.clear-bookmark {
+    border-radius: 20px !important;
+    position: absolute;
+    bottom: 55%;
+    right: 8%;
+}
+
+.clear-history {
+    border-radius: 20px !important;
+    position: absolute;
+    bottom: 8.3%;
+    right: 8%;
+}
+
+.center-header {
+    padding-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.documents {
     width: 97%;
     height: 46%;
     margin-left: 10px;
@@ -37,8 +95,8 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
-.results
-{
+
+.results {
     width: 97%;
     height: 46%;
     margin: 10px;
@@ -47,23 +105,24 @@
     margin-bottom: 10px;
 }
 
-.bookmark
-{
+.bookmark {
     width: 90%;
     height: 46%;
     margin-left: 10px;
     margin-right: 10px;
     margin-top: 10px;
     margin-bottom: 10px;
-    background-color: #F2FAF9;
+    background-color: #C3C3C4;
+    border-radius: 20px !important;
 }
-.history
-{
+
+.history {
     width: 90%;
     height: 46%;
     margin: 10px;
     margin-right: 10px;
     margin-top: 10px;
     margin-bottom: 10px;
-    background-color: #F2FAF9;
+    background-color: #C3C3C4;
+    border-radius: 20px !important;
 }
