@@ -25,7 +25,8 @@ def highlight_text_in_pdf(filename, words):
         for inst in text_instance:
           highlight = page.addHighlightAnnot(inst)
 
-  doc.save(os.path.join(filename.split("/")[0], filename.split("/")[1], "output_" + filename.split("/")[2]), garbage=4,
+  input_dir = os.path.join(os.getcwd(), "highlighted_pdfs/")
+  doc.save(input_dir + os.path.join("output_" + filename.split("/")[2]), garbage=4,
            deflate=True, clean=True)
 
 
@@ -125,8 +126,8 @@ app.layout = \
           placeholder="search",
         ),
         html.Button('Submit', id='submit_val', n_clicks=0),
-    ])
-  ]),
+      ])
+    ]),
     html.Div(className="middle_field", children=[
       html.Div(id="test1"),
       html.Div(id="test2"),
@@ -208,12 +209,13 @@ def add_word_to_search(value, thema, n_clicks):
    Input(component_id='tabs', component_property='value')])
 def open_pdf(n_clicks, topic_value, value):
   if topic_value is not None:
-    topic_value = topic_value + '/output_' + value + ".pdf"
-    input_dir = os.path.join(os.getcwd(), "topics", topic_value)
+    highlighted_document = os.getcwd() + '/highlighted_pdfs' + '/output_' + value + ".pdf"
+    input_dir = os.path.join(highlighted_document)
   if n_clicks > 0:
     highlight_text_in_pdf("topics/thema1/" + value + ".pdf", Utils.history_word)
     os.startfile(input_dir)
 
+
 if __name__ == '__main__':
-  indexer_and_searcher.index_files()
+  # indexer_and_searcher.index_files()
   app.run_server(debug=False)
