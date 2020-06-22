@@ -7,9 +7,9 @@ from dash.dependencies import Input, Output
 import fitz
 from utils import Utils
 import os
-import dash_bootstrap_components as dbc
+# import dash_bootstrap_components as dbc
 
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash()#external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "uRank"
 
 pdf_dict = {}
