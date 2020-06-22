@@ -7,9 +7,9 @@ from dash.dependencies import Input, Output
 import fitz
 from utils import Utils
 import os
-import dash_bootstrap_components as dbc
+# import dash_bootstrap_components as dbc
 
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash()#external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "uRank"
 
 pdf_dict = {}
@@ -215,5 +215,5 @@ def open_pdf(n_clicks, topic_value, value):
     os.startfile(input_dir)
 
 if __name__ == '__main__':
-  indexer_and_searcher.index_files()
+  # indexer_and_searcher.index_files()
   app.run_server(debug=False)
