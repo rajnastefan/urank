@@ -182,6 +182,7 @@ class UserInput:
 
 
   def search_files(self, keyword):
+
     temp_dictionary = {}
     #for keyword in self.list_of_terms:
     for file_name, current_index in self.pdf_indexes.items():
@@ -197,7 +198,7 @@ class UserInput:
               self.list_of_found_words.append(keyword)
 
 
-    self.set_most_occured_words(temp_dictionary, keyword, word_count)
+    #self.set_most_occured_words(temp_dictionary, keyword, word_count)
 
     #print("top pdfs: ")
     #print(self.pdfs_with_most_occured_words)

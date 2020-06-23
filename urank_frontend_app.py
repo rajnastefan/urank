@@ -62,7 +62,6 @@ def select_themas():
 
 def update_fig():
   list_tabs = []
-  print("Lista rijeci", Utils.list_of_found_words)
   for key in Utils.list_of_found_words:
     counter = 1
     y = []
@@ -170,11 +169,6 @@ def select_words():
     clearable=False
   )]
 
-
-def open_pdf_test():
-  print("usli")
-
-
 #######################
 # FRONTEND
 #######################
@@ -250,7 +244,9 @@ app.layout = \
         html.Button('Clear bookmarks', id='clear_bookmark', className='clear-bookmark', n_clicks=0
                     ),
         html.Div(id="bookmark_list", children=[
-          dbc.ListGroup(id="bookmark_group"
+          dbc.ListGroup(id="bookmark_group", children=[
+        dbc.ListGroupItem(html.A(doc, href='/assets/topics/' + indexer_and_searcher.topic + '/' + doc + '.pdf'), className='rounded-bookmark')
+        for doc in indexer_and_searcher.bookmarkes]
                         )
         ])
 
@@ -277,6 +273,8 @@ app.layout = \
    ],
 )
 def bookmark(value, n_clicks, n_clicks2, topic):
+
+
   if n_clicks2 > Utils.bookmark_click_count_clear:
     Utils.bookmarked_documents.clear()
     Utils.bookmark_click_count_clear = n_clicks2
@@ -294,9 +292,12 @@ def bookmark(value, n_clicks, n_clicks2, topic):
       return [dbc.ListGroupItem(html.A(doc, href='/assets/topics/' + topic + '/' + doc + '.pdf'),
                                 className='rounded-bookmark') for doc in Utils.bookmarked_documents]
   else:
-    return [
-      dbc.ListGroupItem(html.A(doc, href='/assets/topics/' + topic + '/' + doc + '.pdf'), className='rounded-bookmark')
-      for doc in Utils.bookmarked_documents]
+
+      if(len(indexer_and_searcher.bookmarkes) > 0):
+        Utils.bookmarked_documents = indexer_and_searcher.bookmarkes.copy()
+      return [
+        dbc.ListGroupItem(html.A(doc, href='/assets/topics/' + str(indexer_and_searcher.topic) + '/' + doc + '.pdf'), className='rounded-bookmark')
+        for doc in Utils.bookmarked_documents]
 
 
 @app.callback(
@@ -344,7 +345,7 @@ def open_pdf(n_clicks, topic_value, value):
   prevent_initial_call=True)
 def add_word_to_search(value, thema, n_clicks):
   if n_clicks > Utils.click_count_temp:
-    print("uso u n kliks gornji")
+    #print("uso u n kliks gornji")
     if value is not None and thema is not None:
       select_topics(thema)
       add_new_keyword(value)
@@ -366,6 +367,16 @@ def update_graph(value, thema, n_clicks):
       return update_fig()
   return update_fig()
 
+@app.callback(
+  Output(component_id='test2', component_property='children'),
+  [Input(component_id='words-dd', component_property='value')])
+def clear_word_dropdown(value):
+  diff_words = list(set(Utils.list_of_found_words) - set(value))
+  if(len(diff_words) == 1):
+    Utils.list_of_found_words.remove(diff_words[0])
+    indexer_and_searcher.clear_searched_words(diff_words[0])
+
+
 
 @app.callback(
   Output(component_id='words-dropdown', component_property='children'),
@@ -384,5 +395,6 @@ def update_word_dropdown(value, thema, n_clicks):
 if __name__ == '__main__':
   #indexer_and_searcher.index_files()
   indexer_and_searcher.init_bookmarks()
+  #print(indexer_and_searcher.bookmarkes)
 
   app.run_server(debug=False)
