@@ -49,6 +49,21 @@ class UserInput:
 
   #----------------new implementation------------------------------------------------#
 
+  def clear_searched_words(self, keyword):
+    temp_found_pdfs = {}
+    for file_name, value in self.found_pdfs.items():
+      for keyword_it, values in value.items():
+        for word, count in values.items():
+          if(word != keyword):
+            if(file_name not in temp_found_pdfs.keys()):
+              temp_dict = {file_name: {'keywords': {}}}
+              temp_dict[file_name]['keywords'] = {word: count}
+              temp_found_pdfs.update(temp_dict)
+            else:
+              temp_found_pdfs[file_name]['keywords'][word] = count
+
+    self.found_pdfs = temp_found_pdfs
+
   def clear_bookmarks_indices(self):
     for bookmark in  self.bookmark_indexes:
       self.es.delete(id = bookmark, index=bookmark, doc_type='my_type')
