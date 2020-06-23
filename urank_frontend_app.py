@@ -117,7 +117,7 @@ def select_topics(topic):
 
 def add_new_keyword(keyword):
   indexer_and_searcher.fill_term_list(keyword)
-  indexer_and_searcher.search_files()
+  indexer_and_searcher.search_files(keyword)
   Utils.list_of_found_words = indexer_and_searcher.list_of_found_words
   # print("found results: ")
   # print(indexer_and_searcher.found_pdfs)
@@ -382,7 +382,7 @@ def update_word_dropdown(value, thema, n_clicks):
 
 
 if __name__ == '__main__':
-  # indexer_and_searcher.index_files()
+  #indexer_and_searcher.index_files()
   indexer_and_searcher.init_bookmarks()
 
   app.run_server(debug=False)

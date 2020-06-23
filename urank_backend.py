@@ -169,20 +169,20 @@ class UserInput:
       self.pdf_indexes.update({file: index})
 
 
-  def search_files(self):
+  def search_files(self, keyword):
     temp_dictionary = {}
-    for keyword in self.list_of_terms:
-      for file_name, current_index in self.pdf_indexes.items():
-        self.es.indices.refresh(index=current_index)
-        search = self.es.search(index=current_index, doc_type='my_type', q=keyword)
-        if(search['hits']['max_score'] != None):
-          doc = self.es.get(index=current_index, doc_type='my_type', id=current_index)
-          word_count = sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(keyword), doc['_source']['attachment']['content'], re.IGNORECASE))
-          if(word_count != 0):
-            temp_dict = self.set_output(word_count, file_name, keyword)
-            temp_dictionary.update(temp_dict)
-            if keyword not in self.list_of_found_words:
-                self.list_of_found_words.append(keyword)
+    #for keyword in self.list_of_terms:
+    for file_name, current_index in self.pdf_indexes.items():
+      self.es.indices.refresh(index=current_index)
+      search = self.es.search(index=current_index, doc_type='my_type', q=keyword)
+      if(search['hits']['max_score'] != None):
+        doc = self.es.get(index=current_index, doc_type='my_type', id=current_index)
+        word_count = sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(keyword), doc['_source']['attachment']['content'], re.IGNORECASE))
+        if(word_count != 0):
+          temp_dict = self.set_output(word_count, file_name, keyword)
+          temp_dictionary.update(temp_dict)
+          if keyword not in self.list_of_found_words:
+              self.list_of_found_words.append(keyword)
 
 
     print("found pdfs: ")
