@@ -50,7 +50,6 @@ class UserInput:
   #----------------new implementation------------------------------------------------#
 
   def clear_bookmarks_indices(self):
-    print(self.bookmark_indexes)
     for bookmark in  self.bookmark_indexes:
       self.es.delete(id = bookmark, index=bookmark, doc_type='my_type')
       self.es.indices.delete(index=bookmark, ignore=[400, 404])
@@ -70,14 +69,12 @@ class UserInput:
       last = False
       count = 1
       while (not last):
-        print(count)
-
         current_index = "bookmark_index_" + str(count)
-        print(current_index)
         if (self.es.indices.exists(index=current_index)):
           doc = self.es.get(index=current_index, id=current_index)
-          bookmarks.append(doc['_source']['attachment']['content'])
-          print(doc['_source']['attachment']['content'])
+          json_string = json.loads(doc['_source']['attachment']['content'])
+          bookmarks.append(json_string['bookmark'])
+          #print(doc['_source']['attachment']['content'])
           bookmarks_indexes.append(current_index)
           count = count + 1
         else:
@@ -88,7 +85,7 @@ class UserInput:
   def index_bookmark(self, bookmark):
     if (self.check_first_index()):
       index_value = self.get_last_index()
-      print(index_value)
+      #print(index_value)
     else:
       index_value = 1
 
@@ -99,7 +96,7 @@ class UserInput:
 
     new_index = 'bookmark_index_' + str(index_value)
     self.bookmark_indexes.append(new_index)
-    self.bookmarkes.append(content)
+    self.bookmarkes.append(bookmark)
     self.es.index(id=new_index, index=new_index, doc_type='my_type', pipeline='attachment', refresh=True, body = {'data': data})
 
 
@@ -185,17 +182,10 @@ class UserInput:
               self.list_of_found_words.append(keyword)
 
 
-    print("found pdfs: ")
-    print(self.found_pdfs)
+    self.set_most_occured_words(temp_dictionary, keyword, word_count)
 
-
-    if(len(temp_dictionary) > 0):
-      temporary_dictionary = self.find_most_occured_words(temp_dictionary)
-      if (len(temporary_dictionary) > 0):
-        self.pdfs_with_most_occured_words.update(temporary_dictionary)
-
-    print("top pdfs: ")
-    print(self.pdfs_with_most_occured_words)
+    #print("top pdfs: ")
+    #print(self.pdfs_with_most_occured_words)
 
 
   def set_output(self, word_count, file_name, keyword):
@@ -213,6 +203,16 @@ class UserInput:
 
     return temp_dict
 
+  def set_most_occured_words(self, temp_dictionary, keyword, word_count):
+    if (len(temp_dictionary) > 0):
+      temporary_dictionary, file_key = self.find_most_occured_words(temp_dictionary)
+      if (len(temporary_dictionary) > 0):
+        if (file_key in self.pdfs_with_most_occured_words.keys()):
+          self.pdfs_with_most_occured_words[file_key]['keywords'][keyword] = word_count
+        else:
+          self.pdfs_with_most_occured_words.update(temporary_dictionary)
+
+
   def find_most_occured_words(self, temp_dict):
 
     word_to_insert = None
@@ -223,8 +223,6 @@ class UserInput:
     for pdf, pdf_key in temp_dict.items():
       for keywords, values in pdf_key.items():
         for word, count in values.items():
-          print(count)
-          print(prev_count)
           if(count > prev_count):
             word_to_insert = word
             count_to_insert = count
@@ -233,7 +231,7 @@ class UserInput:
 
     temp_dict = {file_to_insert: {'keywords': {}}}
     temp_dict[file_to_insert]['keywords'] = {word_to_insert: count_to_insert}
-    return temp_dict
+    return temp_dict, file_to_insert
 
 
   #################################################################################
@@ -267,7 +265,7 @@ class UserInput:
       if file[-4:] == ".pdf":
         try:
           path_to_file = os.path.join(input_dir, file)
-          print(path_to_file)
+          #print(path_to_file)
           pdf = pdfplumber.open(path_to_file)
           list_of_words = self.extract_and_print_text(pdf)
           self.pdf_dict.update({file: list_of_words})
