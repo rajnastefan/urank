@@ -1,13 +1,13 @@
-#Urank documentation for Windows
-#Prerquisites:
+# Urank documentation for Windows
+# Prerquisites:
     python3
     docker 
 
-###Docker Download
+### Docker Download
 Download docker (for Win10)
 https://hub.docker.com/editions/community/docker-ce-desktop-windows/
 
-###Docker setup
+### Docker setup
   * Go to Docker settings and in the "Network" tab set DNS Server as fixed
   * In Advanced tab increase number of CPUs and Memory
   * Navigate to urank/docker_config folder and run following commands in Windows PowerShell(pull last image)
